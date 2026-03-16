@@ -1,33 +1,84 @@
-## IDEAS-TIH Monorepo
+## Legal Doc Drafter (IDEAS-TIH)
 
-This repository contains three components:
+Legal Doc Drafter is an AWS-backed app that ingests legal documents (PDF/DOCX/TXT), extracts structured fields using Gemini, and produces **professional LaTeX + PDF outputs** (e.g., NDA, MOU, contracts).
 
-- **Backend (AWS Lambda)**: `backend/lambda/`
+This repository is organized as a monorepo containing:
+
 - **Web app (static HTML/CSS/JS)**: `web-app/`
 - **Mobile app (Flutter)**: `mobile-app/`
+- **Backend (AWS Lambda, Python)**: `backend/lambda/`
+
+### Key features
+
+- **Document ingestion**: Upload PDF/DOCX/TXT (or paste text on mobile).
+- **AI extraction**: Gemini extracts structured fields validated via Pydantic schemas.
+- **High-quality output**: LaTeX templates compiled to PDF using a TeXLive Lambda Layer.
+- **AWS-native**: Cognito auth + S3 storage + API Gateway → Lambda.
 
 ### Repository layout
 
 ```text
 backend/
   lambda/
-web-app/
-mobile-app/
 docs/
+mobile-app/
 scripts/
+web-app/
 ```
 
-### Quick start
+### Documentation
+
+- **Architecture**: `docs/architecture.md`
+- **Deployment**: `docs/deployment.md`
+- **Contributing**: `CONTRIBUTING.md`
+
+### Quick start (local)
 
 ### Web app
 
-See `web-app/README.md`.
+Serve the static site from the repo root:
 
-### Mobile app
+```bash
+python -m http.server 8000
+```
 
-See `mobile-app/README.md`.
+Open:
 
-### Backend
+- `http://localhost:8000/web-app/src/index.html`
+- `http://localhost:8000/web-app/src/doc-parser.html`
 
-See `backend/README.md`.
+More: `web-app/README.md`
+
+### Mobile app (Flutter)
+
+```bash
+cd mobile-app
+flutter pub get
+flutter run
+```
+
+More: `mobile-app/README.md`
+
+### Backend (Lambda)
+
+The Lambda source is under `backend/lambda/src/` (handler: `lambda_function.lambda_handler`).
+
+```bash
+cd backend/lambda
+python -m venv .venv
+.\.venv\Scripts\pip install -r requirements.txt
+```
+
+More: `backend/README.md`
+
+### Configuration & secrets
+
+This repo expects AWS resources (Cognito, S3, API Gateway) and a deployed Lambda.
+
+- **Do not commit secrets** (API keys, AWS credentials).
+- Backend requires `GEMINI_API_KEY` and `BUCKET_NAME` environment variables.
+
+### License
+
+License is currently **not specified**. If you plan to open-source this repository, add a `LICENSE` file.
 
