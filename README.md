@@ -30,6 +30,7 @@ web-app/
 
 - **Architecture**: `docs/architecture.md`
 - **Deployment**: `docs/deployment.md`
+- **AWS setup (step-by-step)**: `docs/aws_setup_guide.md`
 - **Contributing**: `CONTRIBUTING.md`
 
 ### Quick start (local)
