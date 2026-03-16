@@ -263,7 +263,9 @@ Integrate it with your Lambda.
 
 This repo sends a Cognito JWT in the `Authorization` header.
 
-Configure a JWT authorizer in API Gateway using your User Pool and require it for `POST /process`.
+Configure a JWT authorizer in API Gateway using your User Pool and require it for:
+
+- `POST /process`
 
 ---
 
@@ -287,6 +289,10 @@ This generates:
 
 - `web-app/src/config.js`
 - `mobile-app/lib/app_config.dart`
+
+Make sure your `project.config.json` includes:
+
+- `api.processUrl` (API Gateway `/process`)
 
 ### G2) Mobile app configuration
 
@@ -312,8 +318,12 @@ Tip: Keep `GEMINI_API_KEY` out of Git. Store it only in AWS (Lambda env vars or 
 1. Open your deployed website `index.html`
 2. Click Login → complete Cognito login → you should land on `doc-parser.html`
 3. Upload a file → confirm it appears in S3 under `uploads/`
-4. Click process → Lambda runs → confirm output appears in S3 under `generated/`
-5. The UI should show and download the generated PDF
+4. Click a file in the left panel → confirm it previews:
+   - DOCX previews as HTML
+   - TXT previews as text
+   - PDF previews in the embedded viewer
+5. Click process → Lambda runs → confirm output appears in S3 under `generated/`
+6. The UI should show and download the generated PDF
 
 ---
 

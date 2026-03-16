@@ -7,6 +7,16 @@ Static HTML/CSS/JS pages live in `web-app/src/`:
 - `app.js`, `style.css`
 - `config.js` (generated)
 
+### Previews (DOCX as HTML)
+
+The dashboard previews files directly from S3:
+
+- **DOCX**: rendered as **HTML** in the browser
+- **TXT**: rendered as text
+- **PDF**: shown in the embedded viewer
+
+No backend preview endpoint is required.
+
 ### Configure for your AWS account
 
 1. Copy `project.config.example.json` → `project.config.json` in the repo root

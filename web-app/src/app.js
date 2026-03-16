@@ -2,6 +2,7 @@ let currentFile = null;
 let fileCount = 0;
 let s3Files = [];
 let draftedDocs = [];
+let activeDraftedDocIndex = null;
 
 function getConfig() {
   const cfg = window.APP_CONFIG;
@@ -20,6 +21,7 @@ const fileList = document.getElementById('file-list');
 const s3FileList = document.getElementById('s3-file-list');
 const previewFrame = document.getElementById('preview-frame');
 const previewEmpty = document.getElementById('preview-empty-state');
+const textPreview = document.getElementById('text-preview');
 const uploadBtn = document.getElementById('s3-upload-btn');
 const processBtn = document.getElementById('process-btn');
 const messagePanel = document.getElementById('message-panel');
@@ -285,6 +287,84 @@ function handleFile(file) {
 }
 
 function showPreview(file) {
+  const name = (file?.name || '').toLowerCase();
+  const isDocx = name.endsWith('.docx');
+  const isTxt = name.endsWith('.txt');
+  const isPdf = name.endsWith('.pdf');
+
+  // Reset preview panes
+  if (previewFrame) {
+    previewFrame.style.display = 'none';
+    previewFrame.src = '';
+  }
+  if (textPreview) {
+    textPreview.style.display = 'none';
+    textPreview.innerHTML = '';
+  }
+
+  // DOCX: convert to HTML in-browser (via mammoth)
+  if (isDocx) {
+    if (previewEmpty) {
+      previewEmpty.style.display = '';
+      const p = previewEmpty.querySelector('p');
+      if (p) p.textContent = 'Loading DOCX preview...';
+    }
+    uploadBtn.disabled = false;
+    setStatus('waiting', 'Ready to upload', `${file.name} (${formatFileSize(file.size)})`, false);
+
+    const reader = new FileReader();
+    reader.onload = async function (e) {
+      try {
+        const arrayBuffer = e.target.result;
+        if (!window.mammoth) throw new Error('DOCX renderer failed to load (mammoth)');
+
+        const result = await window.mammoth.convertToHtml({ arrayBuffer });
+        const html = result?.value || '';
+
+        if (previewEmpty) previewEmpty.style.display = 'none';
+        if (textPreview) {
+          textPreview.style.display = 'block';
+          textPreview.innerHTML = html || '<p><em>No text found in DOCX.</em></p>';
+        }
+      } catch (err) {
+        console.error(err);
+        if (previewEmpty) {
+          previewEmpty.style.display = '';
+          const p = previewEmpty.querySelector('p');
+          if (p) p.textContent = 'Could not preview DOCX. Please upload and process.';
+        }
+      }
+    };
+    reader.readAsArrayBuffer(file);
+    return;
+  }
+
+  // TXT: show plain text (no iframe downloads)
+  if (isTxt) {
+    if (previewEmpty) {
+      previewEmpty.style.display = '';
+      const p = previewEmpty.querySelector('p');
+      if (p) p.textContent = 'Loading text preview...';
+    }
+    uploadBtn.disabled = false;
+    setStatus('waiting', 'Ready to upload', file.name + ' (' + formatFileSize(file.size) + ')', false);
+
+    const reader = new FileReader();
+    reader.onload = function () {
+      const text = String(reader.result || '');
+      if (previewEmpty) previewEmpty.style.display = 'none';
+      if (textPreview) {
+        textPreview.style.display = 'block';
+        // Escape HTML
+        textPreview.innerHTML = '<pre style="white-space: pre-wrap; margin: 0;"></pre>';
+        textPreview.querySelector('pre').textContent = text;
+      }
+    };
+    reader.readAsText(file);
+    return;
+  }
+
+  // PDF (and other browser-viewable types): use iframe
   const objectUrl = URL.createObjectURL(file);
   previewFrame.src = objectUrl;
   previewFrame.style.display = 'block';
@@ -369,6 +449,25 @@ function addS3File(fileObj) {
   checkbox.type = 'checkbox';
   checkbox.className = 'file-checkbox';
   checkbox.dataset.key = String(fileObj.key);
+  const handleAutoPreview = async function () {
+    try {
+      const checkedBoxes = document.querySelectorAll('#s3-file-list input[type="checkbox"]:checked');
+      if (checkedBoxes.length === 1) {
+        const key = checkedBoxes[0].dataset.key;
+        await previewS3Key(key);
+      } else if (checkedBoxes.length === 0) {
+        // No selection: clear preview back to empty state
+        _clearPreviewToEmpty('Select a file to preview.');
+        setStatus('waiting', 'Ready', 'Select a file to preview or process.', false);
+      }
+    } catch (e) {
+      console.error(e);
+      setStatus('error', 'Preview failed', e.message || String(e), false);
+    } finally {
+      updateProcessButtonState();
+    }
+  };
+
   checkbox.addEventListener('change', function () {
     if (checkbox.checked) {
       li.classList.add('selected');
@@ -376,6 +475,23 @@ function addS3File(fileObj) {
       li.classList.remove('selected');
     }
     updateProcessButtonState();
+    // Auto-preview only when exactly one file is selected
+    handleAutoPreview();
+  });
+
+  // Clicking the row toggles selection (and triggers auto-preview via change handler)
+  li.addEventListener('click', function (e) {
+    if (e.target === checkbox) return;
+    // If already selected and it's the only selected item, treat click as "close preview"
+    const checkedBoxes = document.querySelectorAll('#s3-file-list input[type="checkbox"]:checked');
+    if (checkbox.checked && checkedBoxes.length === 1) {
+      checkbox.checked = false;
+      checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+      return;
+    }
+
+    checkbox.checked = !checkbox.checked;
+    checkbox.dispatchEvent(new Event('change', { bubbles: true }));
   });
 
   li.appendChild(checkbox);
@@ -403,6 +519,114 @@ function addS3File(fileObj) {
 function updateProcessButtonState() {
   const checkedBoxes = document.querySelectorAll('#s3-file-list input[type="checkbox"]:checked');
   processBtn.disabled = checkedBoxes.length === 0;
+}
+
+function _clearPreviewToEmpty(message) {
+  if (previewFrame) {
+    previewFrame.style.display = 'none';
+    previewFrame.src = '';
+  }
+  if (textPreview) {
+    textPreview.style.display = 'none';
+    textPreview.innerHTML = '';
+  }
+  if (previewEmpty) {
+    previewEmpty.style.display = '';
+    const p = previewEmpty.querySelector('p');
+    if (p) p.textContent = message || 'Select a file to preview.';
+  }
+  if (downloadPdfBtn) downloadPdfBtn.style.display = 'none';
+}
+
+function _renderText(text) {
+  if (previewEmpty) previewEmpty.style.display = 'none';
+  if (previewFrame) {
+    previewFrame.style.display = 'none';
+    previewFrame.src = '';
+  }
+  if (textPreview) {
+    textPreview.style.display = 'block';
+    textPreview.innerHTML = '<pre style="white-space: pre-wrap; margin: 0;"></pre>';
+    textPreview.querySelector('pre').textContent = text || '';
+  }
+}
+
+function _renderHtml(html) {
+  if (previewEmpty) previewEmpty.style.display = 'none';
+  if (previewFrame) {
+    previewFrame.style.display = 'none';
+    previewFrame.src = '';
+  }
+  if (textPreview) {
+    textPreview.style.display = 'block';
+    textPreview.innerHTML = html || '<p><em>No content.</em></p>';
+  }
+}
+
+function _renderPdfFromBytes(bytes) {
+  if (previewEmpty) previewEmpty.style.display = 'none';
+  if (textPreview) {
+    textPreview.style.display = 'none';
+    textPreview.innerHTML = '';
+  }
+  const blob = new Blob([bytes], { type: 'application/pdf' });
+  const url = URL.createObjectURL(blob);
+  if (previewFrame) {
+    previewFrame.style.display = 'block';
+    previewFrame.src = url;
+  }
+  if (downloadPdfBtn) {
+    downloadPdfBtn.style.display = 'flex';
+    downloadPdfBtn.onclick = function () {
+      window.open(url, "_blank");
+    };
+  }
+}
+
+function _s3GetObjectBytes(key) {
+  return new Promise((resolve, reject) => {
+    s3.getObject({ Key: key }, function (err, data) {
+      if (err) return reject(err);
+      // data.Body is Buffer-like (Uint8Array) in browser SDK
+      resolve(data.Body);
+    });
+  });
+}
+
+async function previewS3Key(key) {
+  const lowerKey = String(key || '').toLowerCase();
+  const ext = lowerKey.split('.').pop();
+
+  _clearPreviewToEmpty('Loading preview...');
+  setStatus('uploading', 'Loading preview...', key, true);
+
+  const body = await _s3GetObjectBytes(key);
+  const bytes = body instanceof Uint8Array ? body : new Uint8Array(body);
+
+  if (ext === 'txt') {
+    const text = new TextDecoder('utf-8').decode(bytes);
+    _renderText(text);
+    setStatus('success', 'Preview ready', 'Text loaded.', false);
+    return;
+  }
+
+  if (ext === 'docx') {
+    if (!window.mammoth) throw new Error('DOCX renderer failed to load (mammoth)');
+    const arrayBuffer = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
+    const result = await window.mammoth.convertToHtml({ arrayBuffer });
+    _renderHtml(result?.value || '');
+    setStatus('success', 'Preview ready', 'DOCX rendered as HTML.', false);
+    return;
+  }
+
+  if (ext === 'pdf') {
+    _renderPdfFromBytes(bytes);
+    setStatus('success', 'Preview ready', 'PDF loaded.', false);
+    return;
+  }
+
+  _clearPreviewToEmpty('Preview not supported for this file type.');
+  setStatus('waiting', 'Ready', 'Preview not supported for this file type.', false);
 }
 
 // --- MODAL & DOCUMENT TYPE SELECTION ---
@@ -576,6 +800,16 @@ function renderDraftedDocuments() {
     `;
 
     card.addEventListener('click', function () {
+      // Clicking the same drafted document toggles the preview off.
+      if (activeDraftedDocIndex === index) {
+        activeDraftedDocIndex = null;
+        document.querySelectorAll('.drafted-doc-card').forEach(c => c.classList.remove('active', 'expanded'));
+        _clearPreviewToEmpty('Select a file to preview.');
+        setStatus('waiting', 'Ready', 'Select a file to preview or process.', false);
+        return;
+      }
+
+      activeDraftedDocIndex = index;
       document.querySelectorAll('.drafted-doc-card').forEach(c => c.classList.remove('active', 'expanded'));
       card.classList.add('active', 'expanded');
       renderLatexInMiddlePanel(doc);

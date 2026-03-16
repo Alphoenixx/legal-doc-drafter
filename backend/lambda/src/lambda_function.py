@@ -56,10 +56,45 @@ def read_txt(data):
 
 
 def read_docx(data):
-    from docx import Document
+    """
+    Extract text from a DOCX without requiring lxml.
 
-    doc = Document(io.BytesIO(data))
-    return "\n".join(p.text for p in doc.paragraphs)
+    Some Lambda environments have a broken/incorrectly-built lxml wheel, which causes:
+    "cannot import name 'etree' from 'lxml'".
+
+    This implementation parses the DOCX (a zip) and reads the main document XML
+    using the standard library XML parser.
+    """
+    import zipfile
+    import xml.etree.ElementTree as ET
+
+    with zipfile.ZipFile(io.BytesIO(data)) as z:
+        # Main body content
+        xml_bytes = z.read("word/document.xml")
+
+    root = ET.fromstring(xml_bytes)
+
+    # WordprocessingML namespace
+    ns = {"w": "http://schemas.openxmlformats.org/wordprocessingml/2006/main"}
+
+    texts = []
+    # Extract all text nodes; this includes paragraphs and table cell text.
+    for t in root.findall(".//w:t", ns):
+        if t.text:
+            texts.append(t.text)
+
+    # Preserve some line breaks: insert newline at paragraph boundaries.
+    # We do this by walking paragraphs and collecting their text.
+    paras = []
+    for p in root.findall(".//w:p", ns):
+        p_text = "".join((t.text or "") for t in p.findall(".//w:t", ns)).strip()
+        if p_text:
+            paras.append(p_text)
+
+    if paras:
+        return "\n".join(paras).strip()
+
+    return "\n".join(texts).strip()
 
 
 def read_pdf(data):
@@ -90,11 +125,14 @@ def escape_latex(text):
         return text
 
     replacements = {
+        "\\": r"\textbackslash{}",
         "&": r"\&",
         "%": r"\%",
         "$": r"\$",
         "#": r"\#",
         "_": r"\_",
+        "~": r"\textasciitilde{}",
+        "^": r"\textasciicircum{}",
         "{": r"\{",
         "}": r"\}",
     }
@@ -240,6 +278,8 @@ DOC_ROUTER = {
 def lambda_handler(event, context):
 
     try:
+
+        raw_path = event.get("rawPath") or event.get("path") or ""
 
         body = json.loads(event.get("body", "{}"))
 

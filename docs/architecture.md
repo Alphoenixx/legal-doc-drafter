@@ -31,22 +31,27 @@ Legal Doc Drafter is a multi-client application (web + mobile) backed by AWS. Us
    - User signs in via **Cognito Hosted UI** (web) or Cognito client (mobile).
 2. **Upload**
    - Client uploads a document to **S3** under a key like `uploads/<id>_<filename>`.
-3. **Generate**
+3. **Preview (web UI)**
+   - The web app previews files by downloading them from S3:
+     - **DOCX** is rendered as **HTML** in-browser
+     - **TXT** is rendered as text
+     - **PDF** is shown in the embedded viewer
+4. **Generate**
    - Client calls **API Gateway** endpoint with JSON:
      - `s3_key`: S3 key of uploaded file
      - `doc_type`: one of `nda`, `mou`, `service_agreement`, `partnership_agreement`, `collaboration_agreement`, `contract`, `statement_of_agreement`, `meeting_resolution`
    - Request includes a Cognito token (for authorization).
-4. **Process in Lambda**
+5. **Process in Lambda**
    - Lambda downloads the object from S3.
    - Extracts text:
      - `.txt`: decode utf-8
-     - `.docx`: `python-docx`
+     - `.docx`: parsed from DOCX XML (no `lxml` dependency)
      - `.pdf`: `PyPDF2`
    - Sends a structured extraction prompt to **Gemini** and requires strict JSON.
    - Validates response against Pydantic schema for the selected `doc_type`.
    - Renders LaTeX using `string.Template` templates.
    - Compiles LaTeX to PDF using `pdflatex`/`pdftex` from the TeXLive layer.
-5. **Persist results**
+6. **Persist results**
    - Lambda uploads generated PDF to S3 under `generated/<uuid>.pdf`.
    - Lambda returns `pdf_url` + generated LaTeX text.
 

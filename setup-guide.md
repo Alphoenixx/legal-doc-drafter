@@ -273,9 +273,13 @@ Upload these files from `web-app/src/` to your bucket (recommended: bucket root)
 4. You should land on `doc-parser.html`
 5. Upload a PDF/DOCX/TXT
 6. Confirm the file appears in S3 under `uploads/`
-7. Click process / choose document type
-8. Confirm a PDF appears in S3 under `generated/`
-9. Confirm the UI shows/opens the PDF
+7. Click a file in the left panel to preview it:
+   - DOCX previews as HTML in the browser
+   - TXT previews as text
+   - PDF previews in the embedded viewer
+8. Click process / choose document type
+9. Confirm a PDF appears in S3 under `generated/`
+10. Confirm the UI shows/opens the PDF
 
 ---
 

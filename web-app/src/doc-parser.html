@@ -245,6 +245,20 @@
             </div>
             <p>Select a document to preview</p>
           </div>
+          <div
+            id="text-preview"
+            style="
+              display: none;
+              width: 100%;
+              height: 100%;
+              overflow: auto;
+              background: white;
+              border-radius: 10px;
+              padding: 14px;
+              line-height: 1.5;
+              color: #0b0f14;
+            "
+          ></div>
           <iframe
             id="preview-frame"
             style="
@@ -516,6 +530,7 @@
       </div>
     </div>
 
+    <script src="https://unpkg.com/mammoth@1.6.0/mammoth.browser.min.js"></script>
     <script src="config.js"></script>
     <script src="app.js"></script>
   </body>

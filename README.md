@@ -13,6 +13,7 @@ This repository is organized as a monorepo containing:
 - **Document ingestion**: Upload PDF/DOCX/TXT (or paste text on mobile).
 - **AI extraction**: Gemini extracts structured fields validated via Pydantic schemas.
 - **High-quality output**: LaTeX templates compiled to PDF using a TeXLive Lambda Layer.
+- **Previews (web)**: Preview DOCX as HTML, TXT as text, and PDFs in the embedded viewer.
 - **AWS-native**: Cognito auth + S3 storage + API Gateway → Lambda.
 
 ### Repository layout
