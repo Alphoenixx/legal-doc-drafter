@@ -1,0 +1,44 @@
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 32px;
+  height: 56px;
+}
+
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-bright);
+  font-weight: 700;
+  font-size: 16px;
+  text-decoration: none;
+}
+.navbar-brand:hover { text-decoration: none; }
+
+.navbar-logo {
+  width: 30px;
+  height: 30px;
+  background: linear-gradient(135deg, var(--accent), #06b6d4);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.navbar-email {
+  color: var(--text-muted);
+  font-size: 13px;
+}

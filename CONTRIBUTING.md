@@ -25,11 +25,19 @@ python scripts/sync_config.py
 
 ### Web app
 
-- Code: `web-app/src/`
-- Run locally from repo root:
+- Code: `web-app/`
+- Run locally:
 
 ```bash
-python -m http.server 8000
+cd web-app
+npm install
+npm run dev
+```
+
+- Build for production:
+
+```bash
+npm run build
 ```
 
 ### Mobile app
@@ -62,9 +70,8 @@ python -m venv .venv
 
 - **Python**: keep functions small and errors explicit; validate all external inputs.
 - **Flutter**: prefer Riverpod patterns already used in the app; keep UI and services separated.
-- **Web**: keep the static app dependency-light; avoid introducing build tooling unless needed.
+- **Web (React)**: follow existing component patterns; use SVG icons (no emojis); maintain the dark enterprise theme; test with `npm run build`.
 
 ### Security
 
 If you discover a security issue (credentials exposure, auth bypass, data leakage), do not open a public issue. Share details privately with the maintainers.
-

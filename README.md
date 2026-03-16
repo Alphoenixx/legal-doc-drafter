@@ -4,17 +4,18 @@ Legal Doc Drafter is an AWS-backed app that ingests legal documents (PDF/DOCX/TX
 
 This repository is organized as a monorepo containing:
 
-- **Web app (static HTML/CSS/JS)**: `web-app/`
+- **Web app (React + Vite)**: `web-app/`
 - **Mobile app (Flutter)**: `mobile-app/`
 - **Backend (AWS Lambda, Python)**: `backend/lambda/`
 
 ### Key features
 
-- **Document ingestion**: Upload PDF/DOCX/TXT (or paste text on mobile).
+- **Document ingestion**: Upload PDF/DOCX/TXT (or paste text).
 - **AI extraction**: Gemini extracts structured fields validated via Pydantic schemas.
 - **High-quality output**: LaTeX templates compiled to PDF using a TeXLive Lambda Layer.
 - **Previews (web)**: Preview DOCX as HTML, TXT as text, and PDFs in the embedded viewer.
-- **AWS-native**: Cognito auth + S3 storage + API Gateway → Lambda.
+- **Immersive 3D UI**: Dark enterprise SaaS theme with React Three Fiber particle network, glassmorphism panels, page transitions, and micro-animations.
+- **AWS-native**: Cognito auth (custom login) + S3 storage + API Gateway → Lambda.
 
 ### Repository layout
 
@@ -39,16 +40,19 @@ web-app/
 
 ### Web app
 
-Serve the static site from the repo root:
-
 ```bash
-python -m http.server 8000
+cd web-app
+npm install
+npm run dev
 ```
 
-Open:
+Open `http://localhost:5173` (or the port shown in terminal).
 
-- `http://localhost:8000/web-app/src/index.html`
-- `http://localhost:8000/web-app/src/doc-parser.html`
+To build for production (static output in `web-app/dist/`):
+
+```bash
+npm run build
+```
 
 More: `web-app/README.md`
 
@@ -87,9 +91,8 @@ For reproducible setup across machines/accounts, copy `project.config.example.js
 python scripts/sync_config.py
 ```
 
-Then upload `web-app/src/` (including the generated `config.js`) to your S3 static site bucket and deploy the backend to AWS (see `setup-guide.md`).
+Then build the web app (`npm run build` in `web-app/`) and upload `web-app/dist/` to your S3 static site bucket (see `setup-guide.md`).
 
 ### License
 
 License is currently **not specified**. If you plan to open-source this repository, add a `LICENSE` file.
-

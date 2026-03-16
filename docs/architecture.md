@@ -6,11 +6,13 @@ Legal Doc Drafter is a multi-client application (web + mobile) backed by AWS. Us
 
 ### Components
 
-- **Web app** (`web-app/src/`)
-  - Static site (HTML/CSS/JS).
-  - Uses AWS JS SDK to upload to S3 and obtain credentials via Cognito.
+- **Web app** (`web-app/`)
+  - React + Vite single-page application (SPA).
+  - Dark enterprise SaaS theme with 3D particle network (React Three Fiber), glassmorphism panels, and Framer Motion page transitions.
+  - Uses AWS JS SDK to upload to S3 and obtain credentials via Cognito Identity Pool.
+  - Custom Cognito login flow (not Hosted UI) — `ALLOW_USER_PASSWORD_AUTH`.
   - Calls API Gateway to trigger document generation.
-  - Reads deployment-specific values from `web-app/src/config.js` (generated).
+  - Reads deployment-specific values from `web-app/src/config.js` (generated as ES module).
 
 - **Mobile app** (`mobile-app/`)
   - Flutter app using Riverpod for state management and `shared_preferences` for offline persistence (draft history and staging queue).
@@ -29,12 +31,12 @@ Legal Doc Drafter is a multi-client application (web + mobile) backed by AWS. Us
 ### Data flow
 
 1. **Authenticate**
-   - User signs in via **Cognito Hosted UI** (web) or Cognito client (mobile).
+   - User signs in via custom Cognito login form (web) or Cognito client (mobile).
 2. **Upload**
    - Client uploads a document to **S3** under a key like `uploads/<id>_<filename>`.
 3. **Preview (web UI)**
    - The web app previews files by downloading them from S3:
-     - **DOCX** is rendered as **HTML** in-browser
+     - **DOCX** is rendered as **HTML** in-browser (using Mammoth.js)
      - **TXT** is rendered as text
      - **PDF** is shown in the embedded viewer
 4. **Generate**
@@ -77,16 +79,15 @@ python scripts/sync_config.py
 
 This generates:
 
-- `web-app/src/config.js`
+- `web-app/src/config.js` (ES module: `export default APP_CONFIG`)
 - `mobile-app/lib/app_config.dart`
 
 ### Security model (high-level)
 
-- **Auth**: Cognito tokens are used by clients and sent to the API.
+- **Auth**: Cognito custom login (web) / Cognito SDK (mobile). Tokens are sent to the API.
 - **Storage**: S3 stores both uploads and generated PDFs.
 - **Least privilege**:
   - Lambda role: read from `uploads/*`, write to `generated/*`.
   - Client role: write to `uploads/*` and list/read as required for the UI.
 - **Secrets**:
   - Keep `GEMINI_API_KEY` in a secret manager (or encrypted env var) and never commit it to the repository.
-

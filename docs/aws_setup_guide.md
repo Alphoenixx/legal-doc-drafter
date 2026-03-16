@@ -2,14 +2,14 @@
 
 This guide helps you deploy **Legal Doc Drafter** on **your own AWS account** from scratch and connect:
 
-- `web-app/` (static website)
+- `web-app/` (React + Vite SPA)
 - `mobile-app/` (Flutter)
 - `backend/lambda/` (Python Lambda + API Gateway)
 - S3 storage + Cognito authentication
 
 By the end, you will be able to upload a document, generate a drafted PDF, and view/download it.
 
-If you want a single “first-time user” walkthrough, start with:
+If you want a single "first-time user" walkthrough, start with:
 
 - `setup-guide.md` (repo root)
 
@@ -17,7 +17,7 @@ If you want a single “first-time user” walkthrough, start with:
 
 ### What you will create in AWS
 
-- **S3 bucket** (stores uploads + generated PDFs, and hosts the web app)
+- **S3 bucket** (stores uploads + generated PDFs, and hosts the web app build output)
 - **Cognito User Pool** (users + login)
 - **Cognito Identity Pool** (gives browser/mobile temporary AWS credentials for S3)
 - **Lambda function** (processes documents)
@@ -52,18 +52,22 @@ In the bucket, create these prefixes (folders):
 - `uploads/`
 - `generated/`
 
-### A3) Upload the web app files
+### A3) Build and upload the web app
 
-Upload **these files** (keep names exactly):
+First, build the React app:
 
-From `web-app/src/` upload:
+```bash
+cd web-app
+npm install
+npm run build
+```
+
+Upload the **contents** of `web-app/dist/` to the bucket root:
 
 - `index.html`
-- `doc-parser.html`
-- `app.js`
-- `style.css`
+- `assets/` (JS/CSS bundles)
 
-Recommended: upload them at the bucket root (so the URLs look like `/index.html`, `/doc-parser.html`).
+The app uses `HashRouter`, so all routes (`/#/login`, `/#/dashboard`) work without URL rewriting.
 
 ### A4) Enable static website hosting
 
@@ -72,7 +76,7 @@ Recommended: upload them at the bucket root (so the URLs look like `/index.html`
 3. **Index document**: `index.html`
 4. Save
 
-You’ll get a website endpoint like:
+You'll get a website endpoint like:
 
 - `http://<bucket>.s3-website-<region>.amazonaws.com`
 
@@ -91,27 +95,16 @@ AWS Console → **Cognito** → **User pools** → Create user pool:
 
 Inside the User Pool:
 
-1. Create **App client** (public client; no client secret for browser/mobile flows)
-2. Note the **App client ID** (you will paste it into code)
+1. Create **App client** (public client)
+2. **Generate client secret**: **Disabled**
+3. Enable authentication flows:
+   - `ALLOW_USER_PASSWORD_AUTH`
+   - `ALLOW_REFRESH_TOKEN_AUTH`
+4. Note the **App client ID**
 
-### B3) Configure Hosted UI (for the web app)
+### B3) Hosted UI (NOT required)
 
-In your User Pool:
-
-1. Configure **Domain** (Cognito hosted domain)
-2. Configure **App client settings / Callback URLs**
-   - Add callback URL pointing to your hosted dashboard page.
-
-For this repo, the redirect goes to the dashboard page:
-
-- `https://<YOUR_BUCKET>.s3.<YOUR_REGION>.amazonaws.com/doc-parser.html`
-
-This must match exactly what you put in `web-app/src/index.html` (`redirectUri`).
-
-Also set:
-
-- Allowed OAuth flows: Authorization code grant or implicit (this repo uses token in URL)
-- Allowed scopes: `email`, `openid`, `profile`
+The web app uses a **custom login form** built into the React application. You do **not** need to configure a Hosted UI domain, callback URLs, or OAuth flows.
 
 ---
 
@@ -287,18 +280,29 @@ python scripts/sync_config.py
 
 This generates:
 
-- `web-app/src/config.js`
+- `web-app/src/config.js` (ES module)
 - `mobile-app/lib/app_config.dart`
 
 Make sure your `project.config.json` includes:
 
 - `api.processUrl` (API Gateway `/process`)
 
-### G2) Mobile app configuration
+### G2) Build and re-upload the web app
+
+After updating the config, rebuild:
+
+```bash
+cd web-app
+npm run build
+```
+
+Upload `web-app/dist/` to S3.
+
+### G3) Mobile app configuration
 
 No direct edits required if you use `project.config.json` + `scripts/sync_config.py`.
 
-### G3) Backend configuration
+### G4) Backend configuration
 
 File: `backend/lambda/src/lambda_function.py`
 
@@ -315,23 +319,27 @@ Tip: Keep `GEMINI_API_KEY` out of Git. Store it only in AWS (Lambda env vars or 
 
 ## Part H — Final checklist (end-to-end test)
 
-1. Open your deployed website `index.html`
-2. Click Login → complete Cognito login → you should land on `doc-parser.html`
-3. Upload a file → confirm it appears in S3 under `uploads/`
-4. Click a file in the left panel → confirm it previews:
+1. Open your deployed website URL
+2. You should see the landing page with 3D particle network
+3. Click **Start Drafting** → custom login form appears
+4. Sign up or sign in → you should land on the dashboard
+5. Upload a file → confirm it appears in S3 under `uploads/`
+6. Click a file in the left panel → confirm it previews:
    - DOCX previews as HTML
    - TXT previews as text
    - PDF previews in the embedded viewer
-5. Click process → Lambda runs → confirm output appears in S3 under `generated/`
-6. The UI should show and download the generated PDF
+7. Click process → Lambda runs → confirm output appears in S3 under `generated/`
+8. The UI should show and download the generated PDF
 
 ---
 
 ## Troubleshooting
 
-### Login fails / redirect mismatch
+### Login fails
 
-- Ensure Cognito App Client callback URL **exactly** matches `redirectUri` in `web-app/src/index.html`.
+- Ensure the Cognito App Client has `ALLOW_USER_PASSWORD_AUTH` enabled.
+- Ensure `Generate client secret` is **disabled**.
+- Verify User Pool ID and App Client ID in `project.config.json`.
 
 ### Upload to S3 fails (AccessDenied)
 
@@ -344,3 +352,8 @@ Tip: Keep `GEMINI_API_KEY` out of Git. Store it only in AWS (Lambda env vars or 
   - S3 permissions
   - TeXLive layer attached (PDF compile requires it)
 
+### Web app loads but doesn't work
+
+- You forgot to run `npm run build` before uploading.
+- You forgot to run `python scripts/sync_config.py` before building.
+- You uploaded source files instead of `dist/` contents.

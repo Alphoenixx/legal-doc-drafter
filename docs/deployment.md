@@ -9,8 +9,9 @@ At minimum you will need:
 - **S3 bucket** for:
   - `uploads/` (source documents)
   - `generated/` (generated PDFs)
-- **Cognito User Pool** (+ Hosted UI) for authentication
-- **Cognito Identity Pool** (optional, but used by the current web implementation) to obtain temporary AWS credentials for S3 access
+  - Static website hosting (for the web app build output)
+- **Cognito User Pool** for authentication (custom login flow, no Hosted UI required)
+- **Cognito Identity Pool** to obtain temporary AWS credentials for S3 access
 - **API Gateway** endpoint that triggers the Lambda
 - **Lambda function** (Python) for document processing
 - **Lambda Layer** providing TeXLive binaries at `/opt/texlive/bin/x86_64-linux`
@@ -51,7 +52,7 @@ A SAM project for the layer is vendored in:
 
 - `backend/lambda/latex-aws-lambda-layer/`
 
-Use that project’s README to build/deploy the layer and attach it to your Lambda.
+Use that project's README to build/deploy the layer and attach it to your Lambda.
 
 ### API Gateway
 
@@ -65,19 +66,31 @@ Ensure your deployed API exposes a compatible route that:
 - forwards the request to the Lambda
 - enforces authentication/authorization (recommended)
 
-### Web app (static hosting)
+### Web app (React + Vite)
 
-The web app is static content in `web-app/src/`. Common hosting options:
+The web app is a React SPA built with Vite. Deployment steps:
 
-- **S3 static website hosting** + CloudFront
-- Any static host (Netlify, Vercel static, GitHub Pages) *if* you handle AWS credentials appropriately
+1. Generate config:
+   ```bash
+   python scripts/sync_config.py
+   ```
+
+2. Build for production:
+   ```bash
+   cd web-app
+   npm install
+   npm run build
+   ```
+
+3. Upload `web-app/dist/` contents to your S3 bucket root.
+
+The app uses **HashRouter** (`/#/login`, `/#/dashboard`), so it works with S3 static hosting without URL rewriting.
 
 Notes:
 
-- Client configuration is centralized in `project.config.json` (root) and applied via:
-  - `python scripts/sync_config.py`
-- The Cognito Hosted UI redirect must match:
-  - `project.config.json` → `aws.cognito.redirectUri`
+- Client configuration is centralized in `project.config.json` (root) and applied via `sync_config.py`.
+- The app uses custom Cognito login (not Hosted UI), so no redirect URL configuration is needed in Cognito.
+- The Cognito App Client must have `ALLOW_USER_PASSWORD_AUTH` enabled and `Generate client secret` disabled.
 
 ### Mobile app (Flutter)
 
@@ -96,11 +109,12 @@ In this repo, you should not edit constants scattered across files. Instead:
 ### Smoke test checklist
 
 - Web:
-  - Login redirects correctly and returns to the dashboard
+  - Login works via custom form (email + password)
+  - Sign up creates a Cognito user and verification email is received
   - Uploads a file to `uploads/` in S3
   - Processing returns a `pdf_url` and PDF loads in preview
+  - 3D animations render (particle network, shield, page transitions)
 - Backend:
   - Lambda can read uploads and write generated PDFs
   - TeXLive binaries are present and PDF compilation succeeds
   - Gemini calls succeed and errors are surfaced cleanly
-

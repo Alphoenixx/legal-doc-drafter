@@ -1,0 +1,116 @@
+.pipeline {
+  padding: 14px 6px 10px;
+  border-radius: var(--radius-sm);
+  background: rgba(8, 16, 24, 0.4);
+  border: 1px solid rgba(18, 214, 197, 0.08);
+  margin-bottom: 8px;
+}
+
+.pipeline-track {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.pipeline-step-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+/* Connector line between nodes */
+.pipeline-connector {
+  position: absolute;
+  top: 16px;
+  right: 50%;
+  width: 100%;
+  height: 2px;
+  background: rgba(203, 213, 225, 0.06);
+  z-index: 0;
+  overflow: hidden;
+}
+.pipeline-connector-fill {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, var(--accent), #06b6d4);
+  transform-origin: left;
+}
+
+/* Traveling beam */
+.pipeline-beam {
+  position: absolute;
+  top: -1px;
+  width: 12px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--accent-glow);
+  box-shadow: 0 0 8px var(--accent), 0 0 16px var(--accent);
+}
+
+/* Node */
+.pipeline-node {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(8, 16, 24, 0.8);
+  border: 1.5px solid rgba(203, 213, 225, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+  transition: border-color 0.3s;
+}
+.pipeline-node.active {
+  border-color: var(--accent);
+  background: rgba(18, 214, 197, 0.1);
+}
+.pipeline-node.current {
+  border-color: var(--accent-glow);
+  box-shadow: 0 0 12px rgba(18, 214, 197, 0.3), 0 0 24px rgba(18, 214, 197, 0.1);
+}
+.pipeline-node-icon {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0;
+}
+.pipeline-node.active .pipeline-node-icon {
+  color: var(--accent);
+}
+
+/* Pulsing ring on current node */
+.pipeline-node-ring {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 1px solid var(--accent);
+  animation: pipeline-ring-pulse 1.5s ease-out infinite;
+}
+@keyframes pipeline-ring-pulse {
+  0% { transform: scale(1); opacity: 0.6; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+
+.pipeline-label {
+  font-size: 7px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-top: 5px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  opacity: 0.5;
+  transition: opacity 0.3s;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  text-align: center;
+}
+.pipeline-label.active {
+  opacity: 1;
+  color: var(--accent);
+}
