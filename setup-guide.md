@@ -214,35 +214,26 @@ Configure a JWT authorizer in API Gateway using your **User Pool** and require i
 
 ---
 
-## Part 6 — Configure this repo by editing ONE file
+## Part 6 — Connecting the apps to AWS
 
-### Step 6.1: Create your local config file
+You need to tell the web app and mobile app what your AWS IDs are so they can connect.
 
-In the repository root:
-
-1. Copy `project.config.example.json`
-2. Rename the copy to `project.config.json`
-3. Open `project.config.json`
-4. Fill in your values:
-   - region, bucket, Cognito User Pool ID, App Client ID, Identity Pool ID, API process URL
-
-Important:
-
-- **Do not commit `project.config.json`** (it is ignored by `.gitignore`).
-- `GEMINI_API_KEY` should be stored in AWS (Lambda env vars), not in GitHub.
-
-### Step 6.2: Generate web + mobile config
-
-Run from repo root:
+To do this easily, run the setup script from the root of the repository:
 
 ```bash
 python scripts/setup.py
 ```
 
-This will give you the option to interactively enter your details, or it will automatically sync your existing `project.config.json` to:
+It will ask you how you want to provide your AWS credentials:
 
-- `web-app/src/config.js`
-- `mobile-app/lib/app_config.dart`
+### Option 1: Interactive Mode (Easiest)
+Type `1` and press Enter. The script will ask you for your Region, S3 Bucket name, Cognito IDs, and API URL one by one. It will then generate all necessary config files for you.
+
+### Option 2: Manual Mode
+Type `2` and press Enter. The script will create an empty file called `project.config.json`.
+1. Open `project.config.json` in a text editor.
+2. Paste your AWS IDs into the file and save it.
+3. Run `python scripts/setup.py` one more time. It will detect your filled-in file and instantly sync the IDs to the React and Flutter apps.
 
 ---
 

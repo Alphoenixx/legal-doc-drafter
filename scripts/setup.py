@@ -72,8 +72,13 @@ def sync_files(cfg: dict):
 
 def main():
     print("=============================================")
-    print("Legal Doc Drafter — Setup")
+    print("Legal Doc Drafter — Configuration Setup")
     print("=============================================\n")
+    print("This script helps you connect the web app and mobile app to your AWS backend.")
+    print("It will generate a 'project.config.json' file and automatically apply it.")
+    print("\nHow would you like to provide your AWS credentials?")
+    print("  1) Interactive Mode (I will ask you for each ID right now)")
+    print("  2) Manual Mode (I will create an empty file, wait for you to paste IDs, then sync them)\n")
 
     # Load existing or example config
     from typing import Any, Dict
@@ -84,20 +89,22 @@ def main():
         cfg = json.loads(EXAMPLE_CONFIG_PATH.read_text(encoding="utf-8"))
 
     # Ask mode
-    mode = input("Do you want to enter AWS details interactively now? (y/n) [y]: ").strip().lower()
-    if mode == 'n':
+    mode = input("Choose an option (1=Interactive, 2=Manual) [1]: ").strip()
+    if mode == '2':
         if not CONFIG_PATH.exists():
-            print(f"\nCreating {CONFIG_PATH.relative_to(ROOT)} from example...")
+            print(f"\n[Step 1] Creating empty {CONFIG_PATH.relative_to(ROOT)}...")
             CONFIG_PATH.write_text(json.dumps(cfg, indent=2), encoding="utf-8")
-            print("Please edit it manually, then run this script again to sync.")
+            print("[Step 2] Please go open that file in your editor and paste your AWS IDs.")
+            print("[Step 3] Once saved, run 'python scripts/setup.py' again to sync to the apps.")
             sys.exit(0)
         else:
-            print("\nSyncing existing project.config.json to web and mobile apps...")
+            print(f"\nFound existing {CONFIG_PATH.relative_to(ROOT)}! Syncing your changes directly...")
             sync_files(cfg)
             sys.exit(0)
 
     # Interactive mode
-    aws_region = prompt("AWS Region", cfg.get("aws", {}).get("region", "ap-south-1"))
+    print("\nOkay, let's set up your AWS configuration.")
+    aws_region = prompt("AWS Region (e.g., us-east-1)", cfg.get("aws", {}).get("region", "ap-south-1"))
     s3_bucket = prompt("S3 Bucket Name", cfg.get("aws", {}).get("s3Bucket", ""))
     
     cognito = cfg.get("aws", {}).get("cognito", {})
