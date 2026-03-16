@@ -1,4 +1,4 @@
-## Legal Doc Drafter (IDEAS-TIH)
+## Legal Doc Drafter
 
 Legal Doc Drafter is an AWS-backed app that ingests legal documents (PDF/DOCX/TXT), extracts structured fields using Gemini, and produces **professional LaTeX + PDF outputs** (e.g., NDA, MOU, contracts).
 
