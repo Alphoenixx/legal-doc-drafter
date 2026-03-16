@@ -269,35 +269,24 @@ After you deploy AWS resources, you must update these files.
 
 ### G1) Web app configuration
 
-Edit **one file**:
+Edit **one file in the repo root**:
+
+1. Copy `project.config.example.json` → `project.config.json`
+2. Edit `project.config.json` with your AWS values
+3. Run:
+
+```bash
+python scripts/sync_config.py
+```
+
+This generates:
 
 - `web-app/src/config.js`
-
-Update:
-
-- `window.APP_CONFIG.aws.region`
-- `window.APP_CONFIG.aws.s3Bucket`
-- `window.APP_CONFIG.aws.cognito.userPoolId`
-- `window.APP_CONFIG.aws.cognito.clientId`
-- `window.APP_CONFIG.aws.cognito.identityPoolId`
-- `window.APP_CONFIG.aws.cognito.hostedUiDomain`
-- `window.APP_CONFIG.aws.cognito.redirectUri`
-- `window.APP_CONFIG.api.processUrl`
+- `mobile-app/lib/app_config.dart`
 
 ### G2) Mobile app configuration
 
-Edit **one file**:
-
-- `mobile-app/lib/app_config.dart`
-
-Update:
-
-- `AppConfig.awsRegion`
-- `AppConfig.s3BucketName`
-- `AppConfig.cognitoUserPoolId`
-- `AppConfig.cognitoClientId`
-- `AppConfig.cognitoIdentityPoolId`
-- `AppConfig.apiProcessUrl`
+No direct edits required if you use `project.config.json` + `scripts/sync_config.py`.
 
 ### G3) Backend configuration
 
@@ -309,6 +298,8 @@ Set Lambda environment variables (in AWS):
 
 - `BUCKET_NAME`
 - `GEMINI_API_KEY`
+
+Tip: Keep `GEMINI_API_KEY` out of Git. Store it only in AWS (Lambda env vars or Secrets Manager).
 
 ---
 

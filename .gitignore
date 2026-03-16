@@ -69,3 +69,6 @@ build/
 # --- AWS / SAM ---
 .aws-sam/
 
+# --- Project local config (do not commit secrets) ---
+project.config.json
+

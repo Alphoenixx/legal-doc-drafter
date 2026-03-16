@@ -79,6 +79,12 @@ This repo expects AWS resources (Cognito, S3, API Gateway) and a deployed Lambda
 - **Do not commit secrets** (API keys, AWS credentials).
 - Backend requires `GEMINI_API_KEY` and `BUCKET_NAME` environment variables.
 
+For reproducible setup across machines/accounts, copy `project.config.example.json` to `project.config.json`, update it, then run:
+
+```bash
+python scripts/sync_config.py
+```
+
 ### License
 
 License is currently **not specified**. If you plan to open-source this repository, add a `LICENSE` file.
