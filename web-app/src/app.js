@@ -255,6 +255,16 @@ function handleFile(file) {
 
   li.onclick = function (e) {
     if (e.target.closest('.file-remove-btn')) return;
+
+    // Toggle: if this file is already active, deselect and hide preview
+    if (li.classList.contains('active')) {
+      li.classList.remove('active');
+      currentFile = null;
+      _clearPreviewToEmpty('Select a file to preview.');
+      uploadBtn.disabled = true;
+      return;
+    }
+
     currentFile = file;
     fileList.querySelectorAll('li').forEach(function (item) { item.classList.remove('active'); });
     li.classList.add('active');
@@ -302,7 +312,7 @@ function showPreview(file) {
     textPreview.innerHTML = '';
   }
 
-  // DOCX: convert to HTML in-browser (via mammoth)
+  // DOCX: convert to HTML in-browser (via mammoth), with plain-text fallback
   if (isDocx) {
     if (previewEmpty) {
       previewEmpty.style.display = '';
@@ -318,20 +328,48 @@ function showPreview(file) {
         const arrayBuffer = e.target.result;
         if (!window.mammoth) throw new Error('DOCX renderer failed to load (mammoth)');
 
-        const result = await window.mammoth.convertToHtml({ arrayBuffer });
-        const html = result?.value || '';
+        // Try HTML conversion first
+        const htmlResult = await window.mammoth.convertToHtml({ arrayBuffer: arrayBuffer.slice(0) });
+        let html = htmlResult?.value || '';
+
+        // If mammoth produced empty/whitespace-only HTML, fall back to extractRawText
+        const strippedHtml = html.replace(/<[^>]*>/g, '').trim();
+        if (!strippedHtml) {
+          const textResult = await window.mammoth.extractRawText({ arrayBuffer: arrayBuffer.slice(0) });
+          const rawText = textResult?.value || '';
+          if (rawText.trim()) {
+            html = '<pre style="white-space: pre-wrap; margin: 0;">' + rawText.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</pre>';
+          } else {
+            html = '<p><em>No text content found in this DOCX file.</em></p>';
+          }
+        }
 
         if (previewEmpty) previewEmpty.style.display = 'none';
         if (textPreview) {
           textPreview.style.display = 'block';
-          textPreview.innerHTML = html || '<p><em>No text found in DOCX.</em></p>';
+          textPreview.innerHTML = html;
         }
       } catch (err) {
-        console.error(err);
-        if (previewEmpty) {
-          previewEmpty.style.display = '';
-          const p = previewEmpty.querySelector('p');
-          if (p) p.textContent = 'Could not preview DOCX. Please upload and process.';
+        console.error('DOCX preview error:', err);
+        // Last-resort fallback: try to read as text
+        try {
+          const textResult = await window.mammoth.extractRawText({ arrayBuffer: e.target.result });
+          const rawText = textResult?.value || '';
+          if (rawText.trim()) {
+            _renderText(rawText);
+          } else {
+            if (previewEmpty) {
+              previewEmpty.style.display = '';
+              const p = previewEmpty.querySelector('p');
+              if (p) p.textContent = 'Could not extract text from DOCX.';
+            }
+          }
+        } catch (e2) {
+          if (previewEmpty) {
+            previewEmpty.style.display = '';
+            const p = previewEmpty.querySelector('p');
+            if (p) p.textContent = 'Could not preview DOCX. Please upload and process.';
+          }
         }
       }
     };
@@ -613,8 +651,27 @@ async function previewS3Key(key) {
   if (ext === 'docx') {
     if (!window.mammoth) throw new Error('DOCX renderer failed to load (mammoth)');
     const arrayBuffer = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
-    const result = await window.mammoth.convertToHtml({ arrayBuffer });
-    _renderHtml(result?.value || '');
+
+    // Try HTML first, fall back to raw text
+    const htmlResult = await window.mammoth.convertToHtml({ arrayBuffer: arrayBuffer.slice(0) });
+    let html = htmlResult?.value || '';
+    const strippedHtml = html.replace(/<[^>]*>/g, '').trim();
+
+    if (!strippedHtml) {
+      const textResult = await window.mammoth.extractRawText({ arrayBuffer: arrayBuffer.slice(0) });
+      const rawText = textResult?.value || '';
+      if (rawText.trim()) {
+        _renderText(rawText);
+        setStatus('success', 'Preview ready', 'DOCX rendered as plain text.', false);
+        return;
+      } else {
+        _renderHtml('<p><em>No text content found in this DOCX file.</em></p>');
+        setStatus('success', 'Preview ready', 'DOCX appears to have no extractable text.', false);
+        return;
+      }
+    }
+
+    _renderHtml(html);
     setStatus('success', 'Preview ready', 'DOCX rendered as HTML.', false);
     return;
   }
