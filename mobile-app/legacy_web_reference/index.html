@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Legal Doc Drafter — AI-Powered Legal Document Generation</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="logo">
+      <div class="logo-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+             stroke="#0b0f14" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/>
+          <path d="M14 2v6h6"/><path d="m9 15 2 2 4-4"/>
+        </svg>
+      </div>
+      Legal Doc Drafter
+    </div>
+
+    <nav class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#security">Security</a>
+      <button id="login-btn" class="btn btn-primary" onclick="login()">Login / Sign Up</button>
+    </nav>
+  </header>
+
+  <!-- Hero -->
+  <main>
+    <section class="hero-section">
+      <div class="hero-badge">
+        <span class="hero-badge-dot"></span>
+        Cloud-Powered
+      </div>
+
+      <h1>
+        Draft legal documents<br/>
+        <span class="gradient-text">powered by AI</span>
+      </h1>
+
+      <p class="hero-desc">
+        Upload legal documents to generate professionally drafted agreements, NDAs, and contracts. 
+        Legal Doc Drafter uses advanced AI with enterprise-grade AWS security 
+        to create legal documents in LaTeX and PDF format.
+      </p>
+
+      <div class="hero-actions">
+        <button class="btn btn-primary btn-lg" onclick="login()">
+          Get Started
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+               fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+          </svg>
+        </button>
+        <button class="btn btn-secondary btn-lg" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">
+          Learn More
+        </button>
+      </div>
+    </section>
+
+    <!-- Features -->
+    <section id="features" class="features-grid" aria-label="Features">
+      <article class="feature-card">
+        <div class="feature-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="1"/><path d="M12 1v6m0 6v6"/><path d="M4.22 4.22l4.24 4.24m5.08 5.08l4.24 4.24"/>
+            <path d="M1 12h6m6 0h6"/><path d="M4.22 19.78l4.24-4.24m5.08-5.08l4.24-4.24"/>
+          </svg>
+        </div>
+        <h3>AI-Powered Drafting</h3>
+        <p>Leverage advanced AI to automatically generate professionally drafted legal documents from your inputs.</p>
+      </article>
+
+      <article class="feature-card" id="security">
+        <div class="feature-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/>
+            <path d="m9 12 2 2 4-4"/>
+          </svg>
+        </div>
+        <h3>Enterprise Security</h3>
+        <p>Enterprise-grade security with AWS Cognito authentication and S3-backed secure document storage.</p>
+      </article>
+
+      <article class="feature-card">
+        <div class="feature-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/>
+            <path d="M14 2v4a2 2 0 0 0 2 2h4"/>
+            <path d="M10 12h4"/><path d="M10 16h4"/>
+          </svg>
+        </div>
+        <h3>LaTeX & PDF Export</h3>
+        <p>Get professional-quality documents in LaTeX format with instant PDF export for printing and sharing.</p>
+      </article>
+    </section>
+  </main>
+
+  <footer class="footer">
+    Legal Doc Drafter &mdash; AI-Powered Legal Document Generation &middot; Built on AWS
+  </footer>
+
+  <script>
+    function login() {
+      const cognitoDomain = "https://ap-south-172jrsgvgi.auth.ap-south-1.amazoncognito.com";
+      const clientId = "73o39h36c36r253ijh5sstnj7e";
+      const redirectUri = "https://doc-parser-app-as.s3.ap-south-1.amazonaws.com/doc-parser.html";
+
+      window.location.href = cognitoDomain
+        + "/login?client_id=" + clientId
+        + "&response_type=token&scope=email+openid+profile"
+        + "&redirect_uri=" + encodeURIComponent(redirectUri);
+    }
+  </script>
+
+</body>
+</html>

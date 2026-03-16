@@ -1,0 +1,43 @@
+PROJECT_ROOT = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+TEXLIVE_SOURCE:=install-tl-unx.tar.gz
+WGET:=/usr/bin/wget
+MD5_pm:=/usr/lib64/perl5/vendor_perl/Digest/MD5.pm
+
+.ONESHELL:
+
+$(TEXLIVE_SOURCE):
+	curl -LO http://mirror.ctan.org/systems/texlive/tlnet/$(TEXLIVE_SOURCE)
+
+$(MD5_pm):
+	yum install -y perl-Digest-MD5
+
+$(WGET):
+	yum install -y wget
+
+# see https://wiki.archlinux.org/index.php/TeX_Live
+TLMGR=/opt/texlive/bin/x86_64-linux/tlmgr
+$(TLMGR): $(TEXLIVE_SOURCE) $(WGET) $(MD5_pm)
+	tar xf $<
+	cd install-tl*
+	./install-tl --profile $(PROJECT_ROOT)texlive.profile
+
+## see https://pandoc.org/MANUAL.html
+## 
+## the following packages might be needed for xelatex, but xelatex
+## is not included in the basic profile. change texlive.profile to
+## add it if necessary
+##
+##	fontspec polyglossia xecjk bidi mathspec upquote microtype
+##	csquotes natbib biblatex bibtex biber 
+
+pandoc-packages: $(TLMGR)
+	$(TLMGR) install \
+		xcolor amsfonts amsmath lm unicode-math \
+		iftex microtype listings fancyvrb booktabs \
+		hyperref ulem geometry setspace babel upquote \
+		microtype parskip xurl oberdiek tools \
+		graphics footnotehyper mdwtools etoolbox ec
+
+all: $(TLMGR) pandoc-packages
+
+

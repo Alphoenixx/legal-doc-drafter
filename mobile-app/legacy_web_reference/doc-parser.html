@@ -1,0 +1,521 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Legal Doc Drafter — Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1408.0.min.js"></script>
+  </head>
+  <body class="parser-body">
+    <!-- Header -->
+    <header>
+      <div class="logo">
+        <div class="logo-icon">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#0b0f14"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path
+              d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"
+            />
+            <path d="M14 2v6h6" />
+            <path d="m9 15 2 2 4-4" />
+          </svg>
+        </div>
+        Legal Doc Drafter
+      </div>
+
+      <button id="logout-btn" onclick="logout()">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          style="margin-right: 6px"
+        >
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+          <polyline points="16 17 21 12 16 7" />
+          <line x1="21" y1="12" x2="9" y2="12" />
+        </svg>
+        Logout
+      </button>
+    </header>
+
+    <!-- 3-Column Layout -->
+    <div class="layout-container">
+      <!-- LEFT: Upload & Files -->
+      <div class="panel left-panel">
+        <h2>Upload</h2>
+
+        <!-- TABBED INTERFACE -->
+        <div class="upload-tabs">
+          <button class="tab-btn active" data-tab="upload-file">
+            Upload File
+          </button>
+          <button class="tab-btn" data-tab="paste-text">Paste Text</button>
+        </div>
+
+        <!-- TAB 1: Upload File -->
+        <div id="upload-file" class="tab-content active">
+          <!-- Drag & Drop zone wrapping the real file input -->
+          <div
+            class="upload-zone"
+            id="drop-zone"
+            role="button"
+            tabindex="0"
+            aria-label="Click or drag files to upload"
+          >
+            <div class="upload-zone-icon">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="17 8 12 3 7 8" />
+                <line x1="12" y1="3" x2="12" y2="15" />
+              </svg>
+            </div>
+            <div class="upload-zone-text">
+              <strong>Click to browse</strong> or drag &amp; drop
+            </div>
+            <div class="upload-zone-hint">PDF, DOCX, TXT</div>
+            <input type="file" id="file-upload" accept=".pdf,.docx,.txt" />
+          </div>
+        </div>
+
+        <!-- TAB 2: Paste Text -->
+        <div id="paste-text" class="tab-content">
+          <textarea
+            id="paste-textarea"
+            class="paste-textarea"
+            placeholder="Paste your legal document text here..."
+          ></textarea>
+          <button
+            id="add-text-btn"
+            class="btn btn-primary"
+            style="width: 100%; margin-top: var(--sp-3)"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polyline points="12 5 12 19"></polyline>
+              <polyline points="5 12 19 12"></polyline>
+            </svg>
+            Add as Text Document
+          </button>
+        </div>
+
+        <div class="file-list-header">
+          <h3>Documents</h3>
+          <span class="file-count" id="file-count">0 files</span>
+        </div>
+
+        <ul id="file-list" aria-label="Uploaded documents"></ul>
+
+        <!-- UPLOADED TO S3 SECTION -->
+        <div class="uploaded-section">
+          <div class="file-list-header">
+            <h3>Uploaded to S3</h3>
+            <span class="file-count" id="s3-count">0 files</span>
+          </div>
+          <ul id="s3-file-list" aria-label="Uploaded S3 documents"></ul>
+        </div>
+
+        <div style="display: flex; gap: var(--sp-2)">
+          <button id="s3-upload-btn" disabled style="flex: 1">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              style="margin-right: 6px"
+            >
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="17 8 12 3 7 8" />
+              <line x1="12" y1="3" x2="12" y2="15" />
+            </svg>
+            Upload to S3
+          </button>
+          <button
+            id="process-btn"
+            disabled
+            style="
+              flex: 1;
+              background: linear-gradient(135deg, var(--accent), #06b6d4);
+            "
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              style="margin-right: 6px"
+            >
+              <circle cx="12" cy="12" r="1" />
+              <path d="M12 1v6m0 6v6" />
+              <path d="M4.22 4.22l4.24 4.24m5.08 5.08l4.24 4.24" />
+              <path d="M1 12h6m6 0h6" />
+              <path d="M4.22 19.78l4.24-4.24m5.08-5.08l4.24-4.24" />
+            </svg>
+            Process Selected
+          </button>
+        </div>
+      </div>
+
+      <!-- MIDDLE: Preview -->
+      <div class="panel middle-panel">
+        <div class="middle-top-bar">
+          <h2>Preview</h2>
+          <button
+            id="download-pdf-btn"
+            style="display: none"
+            title="Download as PDF"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              style="margin-right: 6px"
+            >
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+            Download PDF
+          </button>
+        </div>
+        <div id="preview-container">
+          <div class="preview-empty" id="preview-empty-state">
+            <div class="preview-empty-icon">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"
+                />
+                <path d="M14 2v4a2 2 0 0 0 2 2h4" />
+              </svg>
+            </div>
+            <p>Select a document to preview</p>
+          </div>
+          <iframe
+            id="preview-frame"
+            style="
+              display: none;
+              width: 100%;
+              height: 100%;
+              border: none;
+              background: white;
+            "
+          ></iframe>
+          <div
+            id="latex-render-container"
+            style="display: none"
+            class="latex-render-area"
+          ></div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Status & Drafted Documents -->
+      <div class="panel right-panel">
+        <h2>Drafted Documents</h2>
+
+        <div id="message-panel">
+          <div class="status-card status-waiting">
+            <div class="status-icon">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="12" cy="12" r="10" />
+                <polyline points="12 6 12 12 16 14" />
+              </svg>
+            </div>
+            <div class="status-content">
+              <strong>Awaiting upload</strong>
+              Select files and process them to begin.
+            </div>
+          </div>
+        </div>
+
+        <div id="drafted-docs-container"></div>
+
+        <div class="info-card">
+          <h4>Processing Options</h4>
+          <div class="stat-row">
+            <span class="stat-label">AI Engine</span>
+            <span class="stat-value">Gemini</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Output</span>
+            <span class="stat-value">LaTeX → PDF</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Formats</span>
+            <span class="stat-value">PDF, TXT</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DOCUMENT TYPE SELECTION MODAL -->
+    <div id="doc-type-modal" class="modal" style="display: none">
+      <div class="modal-overlay" id="modal-overlay"></div>
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Select Document Type</h2>
+          <button
+            class="modal-close"
+            id="modal-close-btn"
+            aria-label="Close modal"
+          >
+            &times;
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <div class="doc-type-grid">
+            <div class="doc-type-card" data-type="nda">
+              <div class="doc-type-icon">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"
+                  />
+                  <polyline points="14 2 14 8 20 8" />
+                  <path d="m9 15 2 2 4-4" />
+                </svg>
+              </div>
+              <div class="doc-type-label">NDA</div>
+              <div class="doc-type-desc">Non-Disclosure Agreement</div>
+            </div>
+
+            <div class="doc-type-card" data-type="mou">
+              <div class="doc-type-icon">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                  <circle cx="9" cy="7" r="4" />
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                </svg>
+              </div>
+              <div class="doc-type-label">MOU</div>
+              <div class="doc-type-desc">Memorandum of Understanding</div>
+            </div>
+
+            <div class="doc-type-card" data-type="service_agreement">
+              <div class="doc-type-icon">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                  <circle cx="9" cy="7" r="4" />
+                  <path d="M16 11h6" />
+                  <path d="M16 15h6" />
+                </svg>
+              </div>
+              <div class="doc-type-label">Service</div>
+              <div class="doc-type-desc">Service Agreement</div>
+            </div>
+
+            <div class="doc-type-card" data-type="partnership_agreement">
+              <div class="doc-type-icon">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                  <circle cx="9" cy="7" r="4" />
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                </svg>
+              </div>
+              <div class="doc-type-label">Partnership</div>
+              <div class="doc-type-desc">Partnership Agreement</div>
+            </div>
+
+            <div class="doc-type-card" data-type="collaboration_agreement">
+              <div class="doc-type-icon">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <polygon
+                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                  />
+                  <circle cx="12" cy="12" r="10" />
+                  <circle cx="12" cy="12" r="7" />
+                </svg>
+              </div>
+              <div class="doc-type-label">Collaboration</div>
+              <div class="doc-type-desc">Collaboration Agreement</div>
+            </div>
+
+            <div class="doc-type-card" data-type="contract">
+              <div class="doc-type-icon">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"
+                  />
+                  <path d="M14 2v6h6" />
+                  <path d="M16 13H8" />
+                  <path d="M16 17H8" />
+                  <path d="M10 9H8" />
+                </svg>
+              </div>
+              <div class="doc-type-label">Contract</div>
+              <div class="doc-type-desc">General Contract</div>
+            </div>
+
+            <div class="doc-type-card" data-type="statement_of_agreement">
+              <div class="doc-type-icon">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z"
+                  />
+                  <circle cx="9" cy="10" r="1" />
+                  <circle cx="12" cy="10" r="1" />
+                  <circle cx="15" cy="10" r="1" />
+                </svg>
+              </div>
+              <div class="doc-type-label">Statement</div>
+              <div class="doc-type-desc">Statement of Agreement</div>
+            </div>
+
+            <div class="doc-type-card" data-type="meeting_resolution">
+              <div class="doc-type-icon">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                  <circle cx="9" cy="7" r="4" />
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                  <path d="M12 14v7" />
+                </svg>
+              </div>
+              <div class="doc-type-label">Resolution</div>
+              <div class="doc-type-desc">Meeting Resolution</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-ghost" id="modal-cancel-btn">Cancel</button>
+          <button class="btn btn-primary" id="modal-generate-btn" disabled>
+            Generate Document
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
