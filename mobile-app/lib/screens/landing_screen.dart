@@ -24,9 +24,12 @@ class LandingScreen extends StatelessWidget {
               child: const Icon(Icons.description, color: Color(0xFF0B0F14), size: 18),
             ),
             const SizedBox(width: 12),
-            const Text(
-              'Legal Doc Drafter',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+            const Expanded(
+              child: Text(
+                'Legal Doc Drafter',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
           ],
         ),
@@ -38,9 +41,14 @@ class LandingScreen extends StatelessWidget {
                 MaterialPageRoute(builder: (context) => const LoginScreen())
               );
             },
-            child: const Text('Login / Sign Up', style: TextStyle(fontWeight: FontWeight.bold)),
+            style: TextButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              minimumSize: const Size(0, 0),
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+            child: const Text('Login', style: TextStyle(fontWeight: FontWeight.bold)),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 8),
         ],
       ),
       body: SingleChildScrollView(

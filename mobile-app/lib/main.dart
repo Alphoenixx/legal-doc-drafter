@@ -200,7 +200,7 @@ class _MainDashboardScreenState extends ConsumerState<MainDashboardScreen> {
               isLabelVisible: ref.watch(unseenUploadsProvider) > 0,
               child: const Icon(Icons.inventory_2),
             ),
-            label: 'Preview & Process',
+            label: 'Preview',
           ),
           NavigationDestination(
             icon: Badge(
@@ -484,12 +484,12 @@ class StagingPreviewTab extends ConsumerWidget {
                         children: [
                           _DocTypeCard(title: 'NDA', subtitle: 'Non-Disclosure Agreement', icon: Icons.lock_outline, onTap: () => trigger('nda')),
                           _DocTypeCard(title: 'MOU', subtitle: 'Mem. of Understanding', icon: Icons.handshake_outlined, onTap: () => trigger('mou')),
-                          _DocTypeCard(title: 'Service', subtitle: 'Service Agreement', icon: Icons.design_services_outlined, onTap: () => trigger('service')),
-                          _DocTypeCard(title: 'Partnership', subtitle: 'Partnership Agreement', icon: Icons.group_outlined, onTap: () => trigger('partnership')),
-                          _DocTypeCard(title: 'Collaboration', subtitle: 'Collaboration Agreement', icon: Icons.hub_outlined, onTap: () => trigger('collaboration')),
+                          _DocTypeCard(title: 'Service', subtitle: 'Service Agreement', icon: Icons.design_services_outlined, onTap: () => trigger('service_agreement')),
+                          _DocTypeCard(title: 'Partnership', subtitle: 'Partnership Agreement', icon: Icons.group_outlined, onTap: () => trigger('partnership_agreement')),
+                          _DocTypeCard(title: 'Collaboration', subtitle: 'Collaboration Agreement', icon: Icons.hub_outlined, onTap: () => trigger('collaboration_agreement')),
                           _DocTypeCard(title: 'Contract', subtitle: 'General Contract', icon: Icons.description_outlined, onTap: () => trigger('contract')),
-                          _DocTypeCard(title: 'Statement', subtitle: 'Statement of Agreement', icon: Icons.article_outlined, onTap: () => trigger('statement')),
-                          _DocTypeCard(title: 'Resolution', subtitle: 'Meeting Resolution', icon: Icons.gavel_outlined, onTap: () => trigger('resolution')),
+                          _DocTypeCard(title: 'Statement', subtitle: 'Statement of Agreement', icon: Icons.article_outlined, onTap: () => trigger('statement_of_agreement')),
+                          _DocTypeCard(title: 'Resolution', subtitle: 'Meeting Resolution', icon: Icons.gavel_outlined, onTap: () => trigger('meeting_resolution')),
                         ],
                       ),
                     ),

@@ -1,7 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/aws_s3_service.dart';
 import 'auth_provider.dart';
-import 'dart:typed_data';
 
 final s3ServiceProvider = Provider((ref) => AwsS3Service());
 

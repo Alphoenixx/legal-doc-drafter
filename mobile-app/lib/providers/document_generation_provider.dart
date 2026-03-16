@@ -73,10 +73,15 @@ class DocumentGenerationNotifier extends Notifier<DocumentGenerationState> {
       // Live API call — mirrors legacy app.js fetch(API_GATEWAY_URL, { method: "POST", ... })
       final data = await apiService.generateDocument(s3Key: s3Key, docType: docType, idToken: idToken);
 
+      final pdfUrl = (data['pdf_url'] as String?) ?? '';
+      if (pdfUrl.isEmpty) {
+        throw Exception('Backend Error: Missing pdf_url in response');
+      }
+
       final doc = DraftedDocument(
         title: docType.toUpperCase(),
         summary: 'AI-generated $docType document',
-        pdfUrl: data['pdf_url'] ?? '',
+        pdfUrl: pdfUrl,
         latexCode: data['latex'] ?? '',
       );
 
