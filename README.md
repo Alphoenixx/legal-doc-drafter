@@ -90,6 +90,17 @@ For reproducible setup across machines/accounts, copy `project.config.example.js
 ```bash
 python scripts/setup.py
 ```
+It will ask you how you want to provide your AWS credentials:
+
+Option 1: Interactive Mode (Easiest)
+Type 1 and press Enter. The script will ask you for your Region, S3 Bucket name, Cognito IDs, and API URL one by one. It will then generate all necessary config files for you.
+
+Option 2: Manual Mode
+Type 2 and press Enter. The script will create an empty file called project.config.json.
+
+Open project.config.json in a text editor.
+Paste your AWS IDs into the file and save it.
+Run python scripts/setup.py one more time. It will detect your filled-in file and instantly sync the IDs to the React and Flutter apps.
 
 Then build the web app (`npm run build` in `web-app/`) and upload `web-app/dist/` to your S3 static site bucket (see `setup-guide.md`).
 
