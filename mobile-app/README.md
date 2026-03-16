@@ -24,6 +24,8 @@ This generates:
 flutter pub get
 ```
 
+*Note: The app relies on `shared_preferences` to persist your staging queue and draft history offline.*
+
 ### Run
 
 ```bash

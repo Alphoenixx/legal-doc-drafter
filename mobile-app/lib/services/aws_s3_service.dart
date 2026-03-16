@@ -48,8 +48,6 @@ class AwsS3Service {
         size: fileBytes.length,
       );
     } catch (e) {
-      print('--- S3 UPLOAD ERROR ---');
-      print(e.toString());
       throw Exception('S3 Upload Failed: $e');
     }
 

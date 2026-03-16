@@ -747,36 +747,6 @@ setStatus('success', 'Processing Complete', 'Document drafted successfully', fal
   updateProcessButtonState();
 });
 
-function simulateAPICall(files) {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      // Mock API response with LaTeX content
-      const mockLatex = `\\documentclass{article}
-\\usepackage[utf-8]{inputenc}
-\\usepackage{geometry}
-\\geometry{a4paper, margin=1in}
-\\title{Non-Disclosure Agreement}
-\\author{}
-\\date{\\today}
-\\begin{document}
-\\maketitle
-\\section*{1. Definition of Confidential Information}
-Confidential Information means any information or data disclosed by one party to another that is marked as confidential or would reasonably be considered confidential given its nature.
-\\section*{2. Obligations}
-The receiving party agrees to maintain the confidentiality of the Confidential Information and not disclose it to third parties without prior written consent.
-\\section*{3. Exclusions}
-This agreement does not apply to information that is publicly available or independently developed without reference to the Confidential Information.
-\\end{document}`;
-
-      resolve({
-        title: 'Non-Disclosure Agreement',
-        summary: 'A comprehensive NDA covering confidentiality obligations, exclusions, and term of the agreement. Suitable for business partnerships and vendor relationships.',
-        latex_code: mockLatex,
-        timestamp: new Date().toLocaleString()
-      });
-    }, 1500);
-  });
-}
 
 function renderDraftedDocuments() {
   draftedDocsContainer.innerHTML = '';

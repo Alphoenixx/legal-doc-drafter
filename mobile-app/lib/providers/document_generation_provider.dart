@@ -1,7 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/api_service.dart';
 import 'auth_provider.dart';
-import '../main.dart';
+import 'local_state_providers.dart';
+import '../utils/storage_helper.dart';
 
 final apiServiceProvider = Provider((ref) => ApiService());
 
@@ -12,13 +13,31 @@ class DraftedDocument {
   final String summary;
   final String pdfUrl;
   final String latexCode;
+  final DateTime createdAt;
   
   DraftedDocument({
     required this.title,
     required this.summary,
     required this.pdfUrl,
     required this.latexCode,
-  });
+    DateTime? createdAt,
+  }) : createdAt = createdAt ?? DateTime.now();
+
+  Map<String, dynamic> toJson() => {
+    'title': title,
+    'summary': summary,
+    'pdfUrl': pdfUrl,
+    'latexCode': latexCode,
+    'createdAt': createdAt.toIso8601String(),
+  };
+
+  factory DraftedDocument.fromJson(Map<String, dynamic> json) => DraftedDocument(
+    title: json['title'] as String,
+    summary: json['summary'] as String,
+    pdfUrl: json['pdfUrl'] as String,
+    latexCode: json['latexCode'] as String,
+    createdAt: json['createdAt'] != null ? DateTime.parse(json['createdAt'] as String) : null,
+  );
 }
 
 class DocumentGenerationState {
@@ -87,7 +106,7 @@ class DocumentGenerationNotifier extends Notifier<DocumentGenerationState> {
 
       // Add to global drafted list provider
       ref.read(draftedDocumentsProvider.notifier).add(doc);
-      ref.read(unseenDraftsProvider.notifier).state++;
+      ref.read(unseenDraftsProvider.notifier).increment();
 
       state = state.copyWith(status: GenerationStatus.success, result: doc);
     } catch (e) {
@@ -110,10 +129,36 @@ final documentGenerationProvider = NotifierProvider<DocumentGenerationNotifier, 
 // Manage history list
 class DraftedDocumentsNotifier extends Notifier<List<DraftedDocument>> {
   @override
-  List<DraftedDocument> build() => [];
-  
+  List<DraftedDocument> build() {
+    _loadFromStorage();
+    return [];
+  }
+
+  Future<void> _loadFromStorage() async {
+    final drafts = await StorageHelper.loadDrafts();
+    if (drafts.isNotEmpty) {
+      state = drafts;
+    }
+  }
+
   void add(DraftedDocument doc) {
-    state = [doc, ...state]; // prepending latest
+    state = [doc, ...state];
+    StorageHelper.saveDrafts(state);
+  }
+
+  void remove(DraftedDocument doc) {
+    state = state.where((d) => d != doc).toList();
+    StorageHelper.saveDrafts(state);
+  }
+
+  void clear() {
+    state = [];
+    StorageHelper.saveDrafts(state);
+  }
+
+  void set(List<DraftedDocument> docs) {
+    state = docs;
+    StorageHelper.saveDrafts(state);
   }
 }
 

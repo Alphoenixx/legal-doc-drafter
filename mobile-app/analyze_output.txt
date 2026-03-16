@@ -1,0 +1,45 @@
+Resolving dependencies...
+Downloading packages...
+  _fe_analyzer_shared 93.0.0 (97.0.0 available)
+  analyzer 10.0.1 (11.0.0 available)
+  archive 3.6.1 (4.0.9 available)
+  flutter_launcher_icons 0.13.1 (0.14.4 available)
+  image 4.3.0 (4.8.0 available)
+  meta 1.17.0 (1.18.1 available)
+  win32 5.15.0 (6.0.0 available)
+  win32_registry 2.1.0 (3.0.2 available)
+Got dependencies!
+8 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+Analyzing mobile-app...                                         
+
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\main.dart:46:39 - deprecated_member_use
+warning - The member 'state' can only be used within 'package:riverpod/src/framework.dart' or a test - lib\main.dart:149:68 - invalid_use_of_visible_for_testing_member
+warning - The member 'state' can only be used within instance members of subclasses of 'AnyNotifier' - lib\main.dart:149:68 - invalid_use_of_protected_member
+warning - The member 'state' can only be used within 'package:riverpod/src/framework.dart' or a test - lib\main.dart:150:67 - invalid_use_of_visible_for_testing_member
+warning - The member 'state' can only be used within instance members of subclasses of 'AnyNotifier' - lib\main.dart:150:67 - invalid_use_of_protected_member
+  error - Undefined name 'unseenDraftsProvider' - lib\providers\document_generation_provider.dart:90:16 - undefined_identifier
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\history_drafts_tab.dart:18:62 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\history_drafts_tab.dart:55:54 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\landing_screen.dart:67:54 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\landing_screen.dart:69:73 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\landing_screen.dart:191:47 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\landing_screen.dart:199:46 - deprecated_member_use
+warning - The member 'state' can only be used within 'package:riverpod/src/framework.dart' or a test - lib\screens\staging_preview_tab.dart:56:75 - invalid_use_of_visible_for_testing_member
+warning - The member 'state' can only be used within instance members of subclasses of 'AnyNotifier' - lib\screens\staging_preview_tab.dart:56:75 - invalid_use_of_protected_member
+warning - The member 'state' can only be used within 'package:riverpod/src/framework.dart' or a test - lib\screens\staging_preview_tab.dart:57:74 - invalid_use_of_visible_for_testing_member
+warning - The member 'state' can only be used within instance members of subclasses of 'AnyNotifier' - lib\screens\staging_preview_tab.dart:57:74 - invalid_use_of_protected_member
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\staging_preview_tab.dart:188:67 - deprecated_member_use
+   info - 'groupValue' is deprecated and shouldn't be used. Use a RadioGroup ancestor to manage group value instead. This feature was deprecated after v3.32.0-0.0.pre - lib\screens\staging_preview_tab.dart:211:29 - deprecated_member_use
+   info - 'onChanged' is deprecated and shouldn't be used. Use RadioGroup to handle value change instead. This feature was deprecated after v3.32.0-0.0.pre - lib\screens\staging_preview_tab.dart:214:29 - deprecated_member_use
+warning - The member 'state' can only be used within 'package:riverpod/src/framework.dart' or a test - lib\screens\upload_tab.dart:56:60 - invalid_use_of_visible_for_testing_member
+warning - The member 'state' can only be used within instance members of subclasses of 'AnyNotifier' - lib\screens\upload_tab.dart:56:60 - invalid_use_of_protected_member
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\upload_tab.dart:68:57 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\upload_tab.dart:77:56 - deprecated_member_use
+warning - The member 'state' can only be used within 'package:riverpod/src/framework.dart' or a test - lib\screens\upload_tab.dart:145:59 - invalid_use_of_visible_for_testing_member
+warning - The member 'state' can only be used within instance members of subclasses of 'AnyNotifier' - lib\screens\upload_tab.dart:145:59 - invalid_use_of_protected_member
+   info - Don't invoke 'print' in production code - lib\services\aws_s3_service.dart:51:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\services\aws_s3_service.dart:52:7 - avoid_print
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\widgets\doc_type_card.dart:17:47 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\widgets\local_file_preview_dialog.dart:96:57 - deprecated_member_use
+

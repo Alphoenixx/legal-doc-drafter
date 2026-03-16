@@ -4,6 +4,8 @@ import 'login_screen.dart';
 class LandingScreen extends StatelessWidget {
   const LandingScreen({super.key});
 
+  static final _featuresKey = GlobalKey();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -64,9 +66,9 @@ class LandingScreen extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF2DD4BF).withOpacity(0.1),
+                      color: const Color(0xFF2DD4BF).withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: const Color(0xFF2DD4BF).withOpacity(0.3)),
+                      border: Border.all(color: const Color(0xFF2DD4BF).withValues(alpha: 0.3)),
                     ),
                     child: const Row(
                       mainAxisSize: MainAxisSize.min,
@@ -115,7 +117,13 @@ class LandingScreen extends StatelessWidget {
                         ),
                       ),
                       ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Scrollable.ensureVisible(
+                            _featuresKey.currentContext!,
+                            duration: const Duration(milliseconds: 600),
+                            curve: Curves.easeInOut,
+                          );
+                        },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF1A2332),
                           foregroundColor: Colors.white,
@@ -131,6 +139,7 @@ class LandingScreen extends StatelessWidget {
             
             // FEATURES SECTION
             Container(
+              key: _featuresKey,
               color: const Color(0xFF0D1219),
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 64),
               width: double.infinity,
@@ -188,7 +197,7 @@ class _FeatureCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: const Color(0xFF111820),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.withOpacity(0.1)),
+        border: Border.all(color: Colors.grey.withValues(alpha: 0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -196,7 +205,7 @@ class _FeatureCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: const Color(0xFF2DD4BF).withOpacity(0.1),
+              color: const Color(0xFF2DD4BF).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(icon, color: const Color(0xFF2DD4BF)),

@@ -119,28 +119,29 @@ def limit_text(text, max_chars=12000):
 # LATEX ESCAPE
 # ============================================================
 
-def escape_latex(text):
-
-    if not isinstance(text, str):
-        return text
-
-    replacements = {
-        "\\": r"\textbackslash{}",
-        "&": r"\&",
-        "%": r"\%",
-        "$": r"\$",
-        "#": r"\#",
-        "_": r"\_",
-        "~": r"\textasciitilde{}",
-        "^": r"\textasciicircum{}",
-        "{": r"\{",
-        "}": r"\}",
-    }
-
-    for k, v in replacements.items():
-        text = text.replace(k, v)
-
-    return text
+def escape_latex(value):
+    """Recursively escape LaTeX special characters in strings, dicts, and lists."""
+    if isinstance(value, str):
+        replacements = {
+            "\\": r"\textbackslash{}",
+            "&": r"\&",
+            "%": r"\%",
+            "$": r"\$",
+            "#": r"\#",
+            "_": r"\_",
+            "~": r"\textasciitilde{}",
+            "^": r"\textasciicircum{}",
+            "{": r"\{",
+            "}": r"\}",
+        }
+        for k, v in replacements.items():
+            value = value.replace(k, v)
+        return value
+    elif isinstance(value, dict):
+        return {k: escape_latex(v) for k, v in value.items()}
+    elif isinstance(value, list):
+        return [escape_latex(item) for item in value]
+    return value
 
 # ============================================================
 # LATEX COMPILATION
@@ -150,6 +151,14 @@ def compile_latex(latex):
 
     if not LATEX_ENGINE:
         raise Exception("No LaTeX engine available")
+
+    # Cleanup leftover files from previous invocations (Lambda reuses containers)
+    import glob
+    for f in glob.glob("/tmp/doc.*"):
+        try:
+            os.remove(f)
+        except OSError:
+            pass
 
     os.chdir("/tmp")
 
@@ -327,10 +336,7 @@ def lambda_handler(event, context):
         # Escape LaTeX
         # ------------------------------------------------
 
-        structured = {
-            k: escape_latex(v) if isinstance(v, str) else v
-            for k, v in structured.items()
-        }
+        structured = escape_latex(structured)
 
         # ------------------------------------------------
         # Generate LaTeX

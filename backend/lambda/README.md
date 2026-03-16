@@ -27,3 +27,6 @@ python -m venv .venv
 - Web/mobile AWS IDs and URLs are configured via `project.config.json` (repo root) and applied with `python scripts/sync_config.py`.
 - Lambda secrets stay in AWS (environment variables / secrets manager). Do not commit API keys.
 
+### Known Limitations
+
+- **Pydantic v1 API**: `pydantic_models.py` uses Pydantic v1 APIs (`.schema()`, `.dict()`). If upgrading to Pydantic v2, these must change to `.model_json_schema()` and `.model_dump()`.

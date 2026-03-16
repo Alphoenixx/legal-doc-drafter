@@ -2,6 +2,10 @@ import 'package:amazon_cognito_identity_dart_2/cognito.dart';
 import '../app_config.dart';
 
 class AwsAuthService {
+  static final AwsAuthService _instance = AwsAuthService._internal();
+  factory AwsAuthService() => _instance;
+  AwsAuthService._internal();
+
   final _userPool = CognitoUserPool(AppConfig.cognitoUserPoolId, AppConfig.cognitoClientId);
   
   CognitoUser? _cognitoUser;

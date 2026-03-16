@@ -13,8 +13,9 @@ Legal Doc Drafter is a multi-client application (web + mobile) backed by AWS. Us
   - Reads deployment-specific values from `web-app/src/config.js` (generated).
 
 - **Mobile app** (`mobile-app/`)
-  - Flutter app using Riverpod for state management.
+  - Flutter app using Riverpod for state management and `shared_preferences` for offline persistence (draft history and staging queue).
   - Authenticates via Cognito and uploads documents to S3.
+  - Streamlined 3-tab UX with auto-navigation between Upload, Staging, and History tabs.
   - Calls the same backend API to generate drafts and shows PDFs in-app.
   - Reads deployment-specific values from `mobile-app/lib/app_config.dart` (generated).
 
