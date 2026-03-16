@@ -42,10 +42,10 @@ src/
 
 ## Configuration
 
-Client config is generated from `project.config.json` (repo root):
+Client config is generated via the interactive setup script:
 
 ```bash
-python scripts/sync_config.py
+python scripts/setup.py
 ```
 
 This produces `src/config.js` with AWS Cognito, S3, and API configuration.

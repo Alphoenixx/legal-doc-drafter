@@ -231,15 +231,15 @@ Important:
 - **Do not commit `project.config.json`** (it is ignored by `.gitignore`).
 - `GEMINI_API_KEY` should be stored in AWS (Lambda env vars), not in GitHub.
 
-### Step 6.2: Generate web + mobile config automatically
+### Step 6.2: Generate web + mobile config
 
 Run from repo root:
 
 ```bash
-python scripts/sync_config.py
+python scripts/setup.py
 ```
 
-This generates/updates:
+This will give you the option to interactively enter your details, or it will automatically sync your existing `project.config.json` to:
 
 - `web-app/src/config.js`
 - `mobile-app/lib/app_config.dart`
@@ -286,7 +286,7 @@ The app uses `HashRouter` (`/#/login`, `/#/dashboard`), so no URL rewriting is n
 
 ## Part 9 — Run the mobile app
 
-After running `python scripts/sync_config.py`:
+After running `python scripts/setup.py`:
 
 ```bash
 cd mobile-app
@@ -320,4 +320,4 @@ Common causes:
 ### Web app loads but doesn't work
 
 - You forgot to run `npm run build` before uploading, or uploaded source files instead of `dist/`.
-- You forgot to run `python scripts/sync_config.py` before building.
+- You forgot to run `python scripts/setup.py` before building.

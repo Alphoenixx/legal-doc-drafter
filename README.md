@@ -85,10 +85,10 @@ This repo expects AWS resources (Cognito, S3, API Gateway) and a deployed Lambda
 - **Do not commit secrets** (API keys, AWS credentials).
 - Backend requires `GEMINI_API_KEY` and `BUCKET_NAME` environment variables.
 
-For reproducible setup across machines/accounts, copy `project.config.example.json` to `project.config.json`, update it, then run:
+For reproducible setup across machines/accounts, copy `project.config.example.json` to `project.config.json` (or use the interactive script):
 
 ```bash
-python scripts/sync_config.py
+python scripts/setup.py
 ```
 
 Then build the web app (`npm run build` in `web-app/`) and upload `web-app/dist/` to your S3 static site bucket (see `setup-guide.md`).

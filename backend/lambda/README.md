@@ -24,7 +24,7 @@ python -m venv .venv
 
 ### Where configuration lives
 
-- Web/mobile AWS IDs and URLs are configured via `project.config.json` (repo root) and applied with `python scripts/sync_config.py`.
+- Web/mobile AWS IDs and URLs are configured via `project.config.json` (repo root) and applied with `python scripts/setup.py`.
 - Lambda secrets stay in AWS (environment variables / secrets manager). Do not commit API keys.
 
 ### Known Limitations

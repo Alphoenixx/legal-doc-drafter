@@ -72,7 +72,7 @@ The web app is a React SPA built with Vite. Deployment steps:
 
 1. Generate config:
    ```bash
-   python scripts/sync_config.py
+   python scripts/setup.py
    ```
 
 2. Build for production:
@@ -88,7 +88,7 @@ The app uses **HashRouter** (`/#/login`, `/#/dashboard`), so it works with S3 st
 
 Notes:
 
-- Client configuration is centralized in `project.config.json` (root) and applied via `sync_config.py`.
+- Client configuration is centralized in `project.config.json` (root) and applied via `setup.py`.
 - The app uses custom Cognito login (not Hosted UI), so no redirect URL configuration is needed in Cognito.
 - The Cognito App Client must have `ALLOW_USER_PASSWORD_AUTH` enabled and `Generate client secret` disabled.
 
@@ -104,7 +104,7 @@ Update any environment/config constants used by the app (API base URL, Cognito I
 In this repo, you should not edit constants scattered across files. Instead:
 
 - Update `project.config.json`
-- Run `python scripts/sync_config.py`
+- Run `python scripts/setup.py`
 
 ### Smoke test checklist
 

@@ -275,7 +275,7 @@ Edit **one file in the repo root**:
 3. Run:
 
 ```bash
-python scripts/sync_config.py
+python scripts/setup.py
 ```
 
 This generates:
@@ -300,7 +300,7 @@ Upload `web-app/dist/` to S3.
 
 ### G3) Mobile app configuration
 
-No direct edits required if you use `project.config.json` + `scripts/sync_config.py`.
+No direct edits required if you use `project.config.json` + `scripts/setup.py`.
 
 ### G4) Backend configuration
 
@@ -355,5 +355,5 @@ Tip: Keep `GEMINI_API_KEY` out of Git. Store it only in AWS (Lambda env vars or 
 ### Web app loads but doesn't work
 
 - You forgot to run `npm run build` before uploading.
-- You forgot to run `python scripts/sync_config.py` before building.
+- You forgot to run `python scripts/setup.py` before building.
 - You uploaded source files instead of `dist/` contents.

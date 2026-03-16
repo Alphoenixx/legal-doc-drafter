@@ -11,7 +11,7 @@ This repo centralizes client configuration in one root file:
 3. Generate the Flutter config file:
 
 ```bash
-python scripts/sync_config.py
+python scripts/setup.py
 ```
 
 This generates:

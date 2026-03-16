@@ -20,7 +20,7 @@ This repo centralizes client-side AWS IDs/URLs in one root file:
 3. Generate client config:
 
 ```bash
-python scripts/sync_config.py
+python scripts/setup.py
 ```
 
 ### Web app

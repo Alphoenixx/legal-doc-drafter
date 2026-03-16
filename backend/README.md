@@ -10,7 +10,7 @@ The Lambda reads an uploaded document from S3, extracts structured fields using 
 
 ### Configuration
 
-- **Client configuration** (web/mobile IDs, URLs): edit `project.config.json` in the repo root and run `python scripts/sync_config.py`.
+- **Client configuration** (web/mobile IDs, URLs): edit `project.config.json` in the repo root and run `python scripts/setup.py`.
 - **Backend secrets/config**: set in AWS Lambda environment variables:
   - `GEMINI_API_KEY`
   - `BUCKET_NAME`

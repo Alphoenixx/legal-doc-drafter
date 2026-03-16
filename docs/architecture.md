@@ -74,7 +74,7 @@ All client-side IDs/URLs are sourced from one root file:
 Then applied by running:
 
 ```bash
-python scripts/sync_config.py
+python scripts/setup.py
 ```
 
 This generates:
