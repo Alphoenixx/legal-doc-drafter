@@ -1,23 +1,20 @@
 {
   "aws": {
-    "region": "ap-south-1",
-    "s3Bucket": "doc-parser-app-as",
+    "region": "YOUR_AWS_REGION",
+    "s3Bucket": "YOUR_S3_BUCKET_NAME",
     "cognito": {
-      "userPoolId": "ap-south-1_72jrSgVgi",
-      "clientId": "73o39h36c36r253ijh5sstnj7e",
-      "identityPoolId": "ap-south-1:572e2fdb-95bc-4675-ba7d-aec010896169",
-      "hostedUiDomain": "https://ap-south-172jrsgvgi.auth.ap-south-1.amazoncognito.com",
-      "redirectUri": "https://doc-parser-app-as.s3.ap-south-1.amazonaws.com/doc-parser.html"
+      "userPoolId": "YOUR_REGION_XXXXXXXXX",
+      "clientId": "YOUR_APP_CLIENT_ID",
+      "identityPoolId": "YOUR_REGION:xxxx-xxxx-xxxx-xxxx-xxxx"
     }
   },
   "api": {
-    "processUrl": "https://11ghprcjk7.execute-api.ap-south-1.amazonaws.com/process"
+    "processUrl": "https://YOUR_API_ID.execute-api.YOUR_REGION.amazonaws.com/process"
   },
   "backend": {
     "lambdaEnv": {
-      "BUCKET_NAME": "doc-parser-app-as",
+      "BUCKET_NAME": "YOUR_S3_BUCKET_NAME",
       "GEMINI_API_KEY": "REPLACE_ME"
     }
   }
 }
-

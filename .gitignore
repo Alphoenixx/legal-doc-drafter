@@ -71,4 +71,6 @@ build/
 
 # --- Project local config (do not commit secrets) ---
 project.config.json
+web-app/src/config.js
+mobile-app/lib/app_config.dart
 
