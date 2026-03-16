@@ -1,17 +1,31 @@
-# legal_doc_app
+## Mobile app (Flutter)
 
-A new Flutter project.
+Flutter project root is `mobile-app/`.
 
-## Getting Started
+### Configure for your AWS account
 
-This project is a starting point for a Flutter application.
+This repo centralizes client configuration in one root file:
 
-A few resources to get you started if this is your first Flutter project:
+1. Copy `project.config.example.json` → `project.config.json` (repo root)
+2. Edit `project.config.json` with your AWS IDs/URLs
+3. Generate the Flutter config file:
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+```bash
+python scripts/sync_config.py
+```
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+This generates:
+
+- `mobile-app/lib/app_config.dart`
+
+### Setup
+
+```bash
+flutter pub get
+```
+
+### Run
+
+```bash
+flutter run
+```

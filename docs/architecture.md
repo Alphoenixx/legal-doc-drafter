@@ -10,11 +10,13 @@ Legal Doc Drafter is a multi-client application (web + mobile) backed by AWS. Us
   - Static site (HTML/CSS/JS).
   - Uses AWS JS SDK to upload to S3 and obtain credentials via Cognito.
   - Calls API Gateway to trigger document generation.
+  - Reads deployment-specific values from `web-app/src/config.js` (generated).
 
 - **Mobile app** (`mobile-app/`)
   - Flutter app using Riverpod for state management.
   - Authenticates via Cognito and uploads documents to S3.
   - Calls the same backend API to generate drafts and shows PDFs in-app.
+  - Reads deployment-specific values from `mobile-app/lib/app_config.dart` (generated).
 
 - **Backend Lambda** (`backend/lambda/src/`)
   - Python Lambda handler: `lambda_function.lambda_handler`
@@ -54,6 +56,23 @@ Lambda environment variables:
 
 - **`GEMINI_API_KEY`**: Gemini API key used for extraction
 - **`BUCKET_NAME`**: target S3 bucket (defaults to `doc-parser-app-as` in code)
+
+### Client configuration (one-file workflow)
+
+All client-side IDs/URLs are sourced from one root file:
+
+- `project.config.json`
+
+Then applied by running:
+
+```bash
+python scripts/sync_config.py
+```
+
+This generates:
+
+- `web-app/src/config.js`
+- `mobile-app/lib/app_config.dart`
 
 ### Security model (high-level)
 

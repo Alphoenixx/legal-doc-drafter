@@ -8,6 +8,13 @@
 
 The Lambda reads an uploaded document from S3, extracts structured fields using Gemini, renders a LaTeX template, compiles it to a PDF (expects a TeXLive layer), uploads the PDF back to S3, and returns the PDF URL.
 
+### Configuration
+
+- **Client configuration** (web/mobile IDs, URLs): edit `project.config.json` in the repo root and run `python scripts/sync_config.py`.
+- **Backend secrets/config**: set in AWS Lambda environment variables:
+  - `GEMINI_API_KEY`
+  - `BUCKET_NAME`
+
 ### LaTeX layer (SAM project)
 
 The repository also includes a TeXLive Lambda Layer project vendored under:

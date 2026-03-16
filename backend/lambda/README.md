@@ -22,3 +22,8 @@ python -m venv .venv
 - Expects `GEMINI_API_KEY` and `BUCKET_NAME` environment variables.
 - Expects a TeXLive layer mounted at `/opt/texlive/bin/x86_64-linux` (see `latex-aws-lambda-layer/`).
 
+### Where configuration lives
+
+- Web/mobile AWS IDs and URLs are configured via `project.config.json` (repo root) and applied with `python scripts/sync_config.py`.
+- Lambda secrets stay in AWS (environment variables / secrets manager). Do not commit API keys.
+

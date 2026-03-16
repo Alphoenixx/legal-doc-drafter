@@ -55,9 +55,9 @@ Use that project’s README to build/deploy the layer and attach it to your Lamb
 
 ### API Gateway
 
-The web app calls an API endpoint (see `web-app/src/app.js`) at a hardcoded URL:
+The web and mobile clients call an API endpoint (see generated config) at:
 
-- `API_GATEWAY_URL`
+- `project.config.json` → `api.processUrl`
 
 Ensure your deployed API exposes a compatible route that:
 
@@ -74,7 +74,10 @@ The web app is static content in `web-app/src/`. Common hosting options:
 
 Notes:
 
-- The Cognito Hosted UI `redirectUri` in `web-app/src/index.html` is currently hardcoded and must match your deployed domain/path.
+- Client configuration is centralized in `project.config.json` (root) and applied via:
+  - `python scripts/sync_config.py`
+- The Cognito Hosted UI redirect must match:
+  - `project.config.json` → `aws.cognito.redirectUri`
 
 ### Mobile app (Flutter)
 
@@ -84,6 +87,11 @@ Build and distribute using standard Flutter workflows:
 - iOS: `flutter build ipa` (requires macOS + Xcode)
 
 Update any environment/config constants used by the app (API base URL, Cognito IDs, S3 bucket/region) so the app points at your deployed AWS resources.
+
+In this repo, you should not edit constants scattered across files. Instead:
+
+- Update `project.config.json`
+- Run `python scripts/sync_config.py`
 
 ### Smoke test checklist
 

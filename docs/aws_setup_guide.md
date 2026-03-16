@@ -9,6 +9,10 @@ This guide helps you deploy **Legal Doc Drafter** on **your own AWS account** fr
 
 By the end, you will be able to upload a document, generate a drafted PDF, and view/download it.
 
+If you want a single “first-time user” walkthrough, start with:
+
+- `setup-guide.md` (repo root)
+
 ---
 
 ### What you will create in AWS

@@ -30,7 +30,8 @@ web-app/
 
 - **Architecture**: `docs/architecture.md`
 - **Deployment**: `docs/deployment.md`
-- **AWS setup (step-by-step)**: `docs/aws_setup_guide.md`
+- **Setup guide (recommended)**: `setup-guide.md`
+- **AWS setup (step-by-step, detailed)**: `docs/aws_setup_guide.md`
 - **Contributing**: `CONTRIBUTING.md`
 
 ### Quick start (local)
@@ -84,6 +85,8 @@ For reproducible setup across machines/accounts, copy `project.config.example.js
 ```bash
 python scripts/sync_config.py
 ```
+
+Then upload `web-app/src/` (including the generated `config.js`) to your S3 static site bucket and deploy the backend to AWS (see `setup-guide.md`).
 
 ### License
 

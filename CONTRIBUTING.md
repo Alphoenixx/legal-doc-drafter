@@ -11,6 +11,18 @@ Thanks for your interest in contributing.
 
 ### Development setup
 
+### Configuration
+
+This repo centralizes client-side AWS IDs/URLs in one root file:
+
+1. Copy `project.config.example.json` → `project.config.json`
+2. Edit `project.config.json`
+3. Generate client config:
+
+```bash
+python scripts/sync_config.py
+```
+
 ### Web app
 
 - Code: `web-app/src/`
