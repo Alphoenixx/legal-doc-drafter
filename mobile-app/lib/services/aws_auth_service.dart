@@ -1,12 +1,8 @@
 import 'package:amazon_cognito_identity_dart_2/cognito.dart';
+import '../app_config.dart';
 
 class AwsAuthService {
-  // Extracted from legacy_web_reference index.html & app.js
-  static const _userPoolId = 'ap-south-1_72jrSgVgi';
-  static const _clientId = '73o39h36c36r253ijh5sstnj7e';
-  // IdentityPoolId is ap-south-1:572e2fdb-95bc-4675-ba7d-aec010896169 but we only need UserPool for direct login right now to get idToken as per legacy implementation.
-  
-  final _userPool = CognitoUserPool(_userPoolId, _clientId);
+  final _userPool = CognitoUserPool(AppConfig.cognitoUserPoolId, AppConfig.cognitoClientId);
   
   CognitoUser? _cognitoUser;
   CognitoUserSession? _session;

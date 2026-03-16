@@ -1,8 +1,9 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import '../app_config.dart';
 
 class ApiService {
-  static const _apiUrl = 'https://11ghprcjk7.execute-api.ap-south-1.amazonaws.com/process';
+  static const _apiUrl = AppConfig.apiProcessUrl;
 
   Future<Map<String, dynamic>> generateDocument({
     required String s3Key,

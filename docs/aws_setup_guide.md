@@ -269,48 +269,35 @@ After you deploy AWS resources, you must update these files.
 
 ### G1) Web app configuration
 
-File: `web-app/src/index.html`
+Edit **one file**:
+
+- `web-app/src/config.js`
 
 Update:
 
-- `cognitoDomain` (your hosted UI domain)
-- `clientId` (your User Pool app client ID)
-- `redirectUri` (your hosted `doc-parser.html` URL)
-
-File: `web-app/src/app.js`
-
-Update:
-
-- `API_GATEWAY_URL`
-- `IdentityPoolId`
-- User Pool ID inside the `Logins` key:
-  - `'cognito-idp.<region>.amazonaws.com/<USER_POOL_ID>'`
-- S3 bucket name:
-  - `params: { Bucket: '<YOUR_BUCKET>' }`
+- `window.APP_CONFIG.aws.region`
+- `window.APP_CONFIG.aws.s3Bucket`
+- `window.APP_CONFIG.aws.cognito.userPoolId`
+- `window.APP_CONFIG.aws.cognito.clientId`
+- `window.APP_CONFIG.aws.cognito.identityPoolId`
+- `window.APP_CONFIG.aws.cognito.hostedUiDomain`
+- `window.APP_CONFIG.aws.cognito.redirectUri`
+- `window.APP_CONFIG.api.processUrl`
 
 ### G2) Mobile app configuration
 
-File: `mobile-app/lib/services/api_service.dart`
+Edit **one file**:
+
+- `mobile-app/lib/app_config.dart`
 
 Update:
 
-- `_apiUrl`
-
-File: `mobile-app/lib/services/aws_auth_service.dart`
-
-Update:
-
-- `_userPoolId`
-- `_clientId`
-
-File: `mobile-app/lib/services/aws_s3_service.dart`
-
-Update:
-
-- `_bucketName`
-- `_region`
-- `_identityPoolId`
-- The `CognitoUserPool('REGION_USERPOOL', 'CLIENT_ID')` inside `CognitoCredentials(...)`
+- `AppConfig.awsRegion`
+- `AppConfig.s3BucketName`
+- `AppConfig.cognitoUserPoolId`
+- `AppConfig.cognitoClientId`
+- `AppConfig.cognitoIdentityPoolId`
+- `AppConfig.apiProcessUrl`
 
 ### G3) Backend configuration
 

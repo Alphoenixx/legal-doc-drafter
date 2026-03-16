@@ -3,8 +3,16 @@ let fileCount = 0;
 let s3Files = [];
 let draftedDocs = [];
 
+function getConfig() {
+  const cfg = window.APP_CONFIG;
+  if (!cfg?.aws?.region || !cfg?.aws?.s3Bucket || !cfg?.aws?.cognito?.identityPoolId || !cfg?.aws?.cognito?.userPoolId || !cfg?.api?.processUrl) {
+    throw new Error("Missing APP_CONFIG. Update web-app/src/config.js");
+  }
+  return cfg;
+}
+
 // API Gateway URL for AI Processing
-const API_GATEWAY_URL = 'https://11ghprcjk7.execute-api.ap-south-1.amazonaws.com/process';
+const API_GATEWAY_URL = getConfig().api.processUrl;
 
 // DOM Elements
 const fileInput = document.getElementById('file-upload');
@@ -37,12 +45,13 @@ if (!idToken) {
   alert("You must be logged in to view this page.");
   window.location.href = "index.html";
 } else {
-  AWS.config.region = 'ap-south-1';
+  const cfg = getConfig();
+  AWS.config.region = cfg.aws.region;
 
   AWS.config.credentials = new AWS.CognitoIdentityCredentials({
-    IdentityPoolId: 'ap-south-1:572e2fdb-95bc-4675-ba7d-aec010896169',
+    IdentityPoolId: cfg.aws.cognito.identityPoolId,
     Logins: {
-      'cognito-idp.ap-south-1.amazonaws.com/ap-south-1_72jrSgVgi': idToken
+      [`cognito-idp.${cfg.aws.region}.amazonaws.com/${cfg.aws.cognito.userPoolId}`]: idToken
     }
   });
   AWS.config.credentials.get(function(err) {
@@ -57,7 +66,7 @@ if (!idToken) {
 // Initialize S3 instance
 const s3 = new AWS.S3({
   apiVersion: '2006-03-01',
-  params: { Bucket: 'doc-parser-app-as' }
+  params: { Bucket: getConfig().aws.s3Bucket }
 });
 
 // --- UTILITY FUNCTIONS ---

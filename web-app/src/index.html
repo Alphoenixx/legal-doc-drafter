@@ -106,11 +106,18 @@
     Legal Doc Drafter &mdash; AI-Powered Legal Document Generation &middot; Built on AWS
   </footer>
 
+  <script src="config.js"></script>
   <script>
     function login() {
-      const cognitoDomain = "https://ap-south-172jrsgvgi.auth.ap-south-1.amazoncognito.com";
-      const clientId = "73o39h36c36r253ijh5sstnj7e";
-      const redirectUri = "https://doc-parser-app-as.s3.ap-south-1.amazonaws.com/doc-parser.html";
+      const cfg = window.APP_CONFIG;
+      if (!cfg?.aws?.cognito?.hostedUiDomain || !cfg?.aws?.cognito?.clientId || !cfg?.aws?.cognito?.redirectUri) {
+        alert("Missing config. Please edit config.js (APP_CONFIG).");
+        return;
+      }
+
+      const cognitoDomain = cfg.aws.cognito.hostedUiDomain;
+      const clientId = cfg.aws.cognito.clientId;
+      const redirectUri = cfg.aws.cognito.redirectUri;
 
       window.location.href = cognitoDomain
         + "/login?client_id=" + clientId

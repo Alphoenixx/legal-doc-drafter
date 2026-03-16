@@ -1,11 +1,12 @@
 import 'package:amazon_cognito_identity_dart_2/cognito.dart';
 import 'package:minio/minio.dart';
 import 'dart:typed_data';
+import '../app_config.dart';
 
 class AwsS3Service {
-  static const _bucketName = 'doc-parser-app-as';
-  static const _region = 'ap-south-1';
-  static const _identityPoolId = 'ap-south-1:572e2fdb-95bc-4675-ba7d-aec010896169';
+  static const _bucketName = AppConfig.s3BucketName;
+  static const _region = AppConfig.awsRegion;
+  static const _identityPoolId = AppConfig.cognitoIdentityPoolId;
 
   /// Uploads a file byte array to S3 using the Minio client.
   /// Exchanges the Cognito [idToken] for temporary IAM credentials via the Identity Pool,
@@ -18,7 +19,7 @@ class AwsS3Service {
     // 1. Get Temporary AWS Credentials using the Identity Pool
     final credentials = CognitoCredentials(
       _identityPoolId,
-      CognitoUserPool('ap-south-1_72jrSgVgi', '73o39h36c36r253ijh5sstnj7e'),
+      CognitoUserPool(AppConfig.cognitoUserPoolId, AppConfig.cognitoClientId),
     );
     await credentials.getAwsCredentials(idToken);
 
