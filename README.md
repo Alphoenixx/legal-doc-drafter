@@ -14,7 +14,7 @@ This repository is organized as a monorepo containing:
 - **AI extraction**: Gemini extracts structured fields validated via Pydantic schemas.
 - **High-quality output**: LaTeX templates compiled to PDF using a TeXLive Lambda Layer.
 - **Previews (web)**: Preview DOCX as HTML, TXT as text, and PDFs in the embedded viewer.
-- **Immersive 3D UI**: Dark enterprise SaaS theme with React Three Fiber particle network, glassmorphism panels, page transitions, and micro-animations.
+- **Immersive 3D UI**: Dark enterprise SaaS theme with React Three Fiber particle networks, floating wireframe geometrics, GSAP scroll-driven storytelling, Framer Motion spring physics, glassmorphism panels, and smooth Lenis scroll.
 - **AWS-native**: Cognito auth (custom login) + S3 storage + API Gateway → Lambda.
 
 ### Repository layout

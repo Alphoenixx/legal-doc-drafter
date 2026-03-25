@@ -8,7 +8,7 @@ Legal Doc Drafter is a multi-client application (web + mobile) backed by AWS. Us
 
 - **Web app** (`web-app/`)
   - React + Vite single-page application (SPA).
-  - Dark enterprise SaaS theme with 3D particle network (React Three Fiber), glassmorphism panels, and Framer Motion page transitions.
+  - Dark enterprise SaaS theme with 3D particle networks (React Three Fiber), floating wireframe geometrics, Framer Motion spring physics, Lenis smooth scroll, Zustand state management, and glassmorphism design language.
   - Uses AWS JS SDK to upload to S3 and obtain credentials via Cognito Identity Pool.
   - Custom Cognito login flow (not Hosted UI) — `ALLOW_USER_PASSWORD_AUTH`.
   - Calls API Gateway to trigger document generation.
