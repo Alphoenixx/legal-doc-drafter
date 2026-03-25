@@ -15,6 +15,11 @@
   max-width: 420px;
   padding: 36px 40px 28px;
   border-radius: var(--radius-lg);
+  background: rgba(11, 22, 32, 0.8);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border: 1px solid rgba(203, 213, 225, 0.08);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.4), 0 0 40px rgba(18, 214, 197, 0.03);
 }
 
 /* Header */
@@ -25,7 +30,7 @@
 .login-logo-icon {
   width: 48px;
   height: 48px;
-  background: linear-gradient(135deg, var(--accent), #06b6d4);
+  background: var(--gradient-accent, linear-gradient(135deg, #12d6c5, #06b6d4));
   border-radius: 14px;
   display: inline-flex;
   align-items: center;
@@ -47,41 +52,7 @@
 /* Form */
 .login-form { display: flex; flex-direction: column; }
 
-.form-group {
-  text-align: left;
-  margin-bottom: 16px;
-}
-.form-group label {
-  display: block;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text-muted);
-  margin-bottom: 6px;
-}
-.form-group input {
-  width: 100%;
-  padding: 11px 14px;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  color: var(--text);
-  font-size: 14px;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-.form-group input:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(18, 214, 197, 0.08);
-}
-.form-group input::placeholder {
-  color: var(--text-muted);
-  opacity: 0.6;
-}
-
-/* Password field */
-.password-field {
-  position: relative;
-}
-.password-field input { padding-right: 44px; }
+/* Password field toggle */
 .toggle-pw {
   position: absolute;
   right: 10px;
@@ -95,6 +66,7 @@
   display: flex;
   align-items: center;
   transition: color 0.2s;
+  z-index: 3;
 }
 .toggle-pw:hover { color: var(--accent); }
 
@@ -106,13 +78,15 @@
   transform: translateY(-50%);
   font-size: 14px;
   font-weight: 700;
+  z-index: 3;
 }
 .confirm-indicator.match { color: var(--success); }
 .confirm-indicator.mismatch { color: var(--error); }
 
 /* Password strength */
 .pw-strength {
-  margin-top: 10px;
+  margin-top: -8px;
+  margin-bottom: 12px;
 }
 .pw-strength-bar {
   height: 3px;
@@ -124,7 +98,6 @@
 .pw-strength-fill {
   height: 100%;
   border-radius: 2px;
-  transition: width 0.3s ease, background 0.3s ease;
 }
 .pw-rules {
   list-style: none;
@@ -140,7 +113,6 @@
   display: flex;
   align-items: center;
   gap: 5px;
-  transition: color 0.2s;
 }
 .pw-rules li.pass {
   color: var(--success);
@@ -186,25 +158,10 @@
 
 /* Submit button */
 .login-btn {
-  width: 100%;
-  padding: 12px;
-  font-size: 14px;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
+  width: 100% !important;
+  padding: 12px !important;
+  font-size: 14px !important;
 }
-
-.btn-spinner {
-  width: 16px;
-  height: 16px;
-  border: 2px solid rgba(8, 16, 24, 0.3);
-  border-top-color: #081018;
-  border-radius: 50%;
-  animation: spin 0.7s linear infinite;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
 
 /* Divider */
 .login-divider {
@@ -275,6 +232,7 @@
   font-size: 13px;
   color: var(--text-muted);
   text-decoration: none;
+  transition: color 0.2s;
 }
 .login-back-link:hover {
   color: var(--accent);

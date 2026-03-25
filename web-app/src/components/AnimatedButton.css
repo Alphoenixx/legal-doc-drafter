@@ -1,0 +1,69 @@
+.anim-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 11px 24px;
+  border-radius: var(--radius-sm);
+  border: none;
+  cursor: pointer;
+  outline: none;
+  position: relative;
+  overflow: hidden;
+  transition: border-color var(--duration-fast) ease;
+}
+
+.anim-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Primary */
+.anim-btn-primary {
+  background: var(--gradient-accent);
+  color: #081018;
+}
+
+/* Ghost */
+.anim-btn-ghost {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+.anim-btn-ghost:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Outline */
+.anim-btn-outline {
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+}
+.anim-btn-outline:hover:not(:disabled) {
+  background: var(--accent-dim);
+}
+
+/* Spinner */
+.anim-btn-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(8, 16, 24, 0.3);
+  border-top-color: #081018;
+  border-radius: 50%;
+  animation: anim-btn-spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+.anim-btn-ghost .anim-btn-spinner,
+.anim-btn-outline .anim-btn-spinner {
+  border-color: rgba(203, 213, 225, 0.2);
+  border-top-color: var(--accent);
+}
+
+@keyframes anim-btn-spin {
+  to { transform: rotate(360deg); }
+}

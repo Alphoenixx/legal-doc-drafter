@@ -3,12 +3,22 @@
   top: 0;
   left: 0;
   right: 0;
-  z-index: 100;
+  z-index: var(--z-navbar, 100);
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 12px 32px;
   height: 56px;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  border-bottom: 1px solid transparent;
+}
+
+.navbar-scrolled {
+  background: rgba(11, 22, 32, 0.85) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  border-bottom-color: rgba(18, 214, 197, 0.08);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
 }
 
 .navbar-brand {
@@ -25,7 +35,7 @@
 .navbar-logo {
   width: 30px;
   height: 30px;
-  background: linear-gradient(135deg, var(--accent), #06b6d4);
+  background: var(--gradient-accent, linear-gradient(135deg, #12d6c5, #06b6d4));
   border-radius: 8px;
   display: flex;
   align-items: center;

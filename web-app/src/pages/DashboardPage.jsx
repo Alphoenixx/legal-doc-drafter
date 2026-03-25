@@ -1,9 +1,15 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../auth/AuthContext';
 import APP_CONFIG from '../config';
 import Navbar from '../components/Navbar';
 import HeroCanvas from '../three/HeroCanvas';
 import ProcessingPipeline from '../components/ProcessingPipeline';
+import AnimatedButton from '../components/AnimatedButton';
+import Modal from '../components/Modal';
+import SkeletonLoader from '../components/SkeletonLoader';
+import { useUIStore } from '../store/store';
+import { springs, fadeInUp, staggerContainer } from '../lib/motion';
 import './DashboardPage.css';
 
 import mammoth from 'mammoth';
@@ -27,15 +33,6 @@ const PaperclipIcon = ({ size = 16 }) => (
 const DownloadIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 6 }}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
 );
-const CloudUpIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 6 }}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-);
-const SparklesIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 6 }}><circle cx="12" cy="12" r="1"/><path d="M12 1v6m0 6v6"/><path d="M4.22 4.22l4.24 4.24m5.08 5.08l4.24 4.24"/><path d="M1 12h6m6 0h6"/><path d="M4.22 19.78l4.24-4.24m5.08-5.08l4.24-4.24"/></svg>
-);
-const LoaderIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 6 }} className="icon-spin"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></svg>
-);
 const PlusIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 6 }}><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
 );
@@ -43,7 +40,7 @@ const XIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
 );
 
-/* Doc type icons — all SVG */
+/* Doc type icons */
 const ShieldIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>;
 const UsersIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>;
 const SettingsIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>;
@@ -83,6 +80,7 @@ const DOC_TYPES = [
 export default function DashboardPage() {
   const { user, logout } = useAuth();
   const fileInputRef = useRef(null);
+  const addToast = useUIStore((s) => s.addToast);
 
   const [localFiles, setLocalFiles] = useState([]);
   const [s3Files, setS3Files] = useState([]);
@@ -91,7 +89,6 @@ export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState('upload');
   const [previewContent, setPreviewContent] = useState(null);
   const [previewLoading, setPreviewLoading] = useState(false);
-  const [uploadStatus, setUploadStatus] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [processing, setProcessing] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -99,6 +96,7 @@ export default function DashboardPage() {
   const [draftedDocs, setDraftedDocs] = useState([]);
   const [activeDraftIdx, setActiveDraftIdx] = useState(null);
   const [pasteText, setPasteText] = useState('');
+  const [processingStep, setProcessingStep] = useState(-1);
 
   const getS3 = useCallback(() => {
     if (!window.AWS) return null;
@@ -174,7 +172,6 @@ export default function DashboardPage() {
       } else if (ext === 'txt') {
         setPreviewContent({ type: 'text', data: new TextDecoder().decode(bytes) });
       }
-      setUploadStatus({ type: 'success', title: 'Preview ready', message: '' });
     } catch (err) {
       setPreviewContent({ type: 'text', data: 'Failed to load preview: ' + err.message });
     } finally {
@@ -198,7 +195,7 @@ export default function DashboardPage() {
     const entry = localFiles.find(e => e.id === selectedLocalId);
     if (!entry) return;
     setUploading(true);
-    setUploadStatus({ type: 'uploading', title: 'Uploading...', message: entry.file.name });
+    addToast({ type: 'loading', title: 'Uploading...', message: entry.file.name });
     try {
       const s3 = getS3();
       const safeName = entry.file.name.replace(/\s+/g, '_');
@@ -207,9 +204,9 @@ export default function DashboardPage() {
       setS3Files(prev => [...prev, { name: safeName, size: entry.file.size, key }]);
       setLocalFiles(prev => prev.filter(e => e.id !== selectedLocalId));
       setSelectedLocalId(null); setSelectedS3Keys(new Set([key]));
-      setUploadStatus({ type: 'success', title: 'Upload Complete', message: key });
+      addToast({ type: 'success', title: 'Upload Complete', message: key });
     } catch (err) {
-      setUploadStatus({ type: 'error', title: 'Upload Failed', message: err.message });
+      addToast({ type: 'error', title: 'Upload Failed', message: err.message });
     } finally { setUploading(false); }
   };
 
@@ -217,7 +214,7 @@ export default function DashboardPage() {
     if (!selectedDocType || selectedS3Keys.size === 0) return;
     setShowModal(false); setProcessing(true);
     setProcessingStep(0);
-    setUploadStatus({ type: 'uploading', title: 'Processing...', message: 'Sending to AI engine' });
+    addToast({ type: 'loading', title: 'Processing...', message: 'Sending to AI engine' });
     try {
       for (const key of selectedS3Keys) {
         setProcessingStep(1);
@@ -234,12 +231,12 @@ export default function DashboardPage() {
         await new Promise(r => setTimeout(r, 400));
         setDraftedDocs(prev => [...prev, { title: selectedDocType.toUpperCase(), summary: 'AI-generated legal document', pdf_url: data.pdf_url, latex_code: data.latex }]);
       }
-      setUploadStatus({ type: 'success', title: 'Processing Complete', message: 'Document drafted successfully' });
+      addToast({ type: 'success', title: 'Processing Complete', message: 'Document drafted successfully' });
     } catch (err) {
       const msg = err.message.toLowerCase();
       if (msg.includes('token') || msg.includes('limit') || msg.includes('too large')) {
-        setUploadStatus({ type: 'error', title: 'Token Limit Reached', message: 'Document exceeds max word limit. Upload a shorter document.' });
-      } else { setUploadStatus({ type: 'error', title: 'Processing Failed', message: err.message }); }
+        addToast({ type: 'error', title: 'Token Limit Reached', message: 'Document exceeds max word limit. Upload a shorter document.' });
+      } else { addToast({ type: 'error', title: 'Processing Failed', message: err.message }); }
     } finally { setProcessing(false); setSelectedDocType(null); setProcessingStep(-1); }
   };
 
@@ -247,7 +244,7 @@ export default function DashboardPage() {
     if (!pasteText.trim()) return;
     handleFile(new File([pasteText], `Pasted_Text_${Date.now()}.txt`, { type: 'text/plain' }));
     setPasteText(''); setActiveTab('upload');
-    setUploadStatus({ type: 'success', title: 'Text Added', message: 'Pasted text added to documents list.' });
+    addToast({ type: 'success', title: 'Text Added', message: 'Pasted text added to documents list.' });
   };
 
   const toggleDraft = (idx) => {
@@ -274,18 +271,25 @@ export default function DashboardPage() {
   const [uploadPulse, setUploadPulse] = useState(false);
   const triggerPulse = () => { setUploadPulse(true); setTimeout(() => setUploadPulse(false), 700); };
 
-  // Processing step
-  const [processingStep, setProcessingStep] = useState(-1);
-
   return (
     <div className="dashboard" ref={dashRef} onMouseMove={handleMouseMove}>
       <div className="dash-cursor-glow" />
       <div className="dash-bg"><HeroCanvas style={{ opacity: 0.15 }} /></div>
       <Navbar />
 
-      <div className="dash-layout">
+      <motion.div
+        className="dash-layout"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ ...springs.gentle, delay: 0.1 }}
+      >
         {/* LEFT PANEL */}
-        <div className="dash-panel left-panel">
+        <motion.div
+          className="dash-panel left-panel"
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ ...springs.gentle, delay: 0.2 }}
+        >
           <h2>Upload</h2>
 
           <div className="upload-tabs">
@@ -293,40 +297,69 @@ export default function DashboardPage() {
             <button className={`tab-btn ${activeTab === 'paste' ? 'active' : ''}`} onClick={() => setActiveTab('paste')}>Paste Text</button>
           </div>
 
-          {activeTab === 'upload' && (
-            <div className={`upload-zone ${uploadPulse ? 'pulse' : ''}`} onClick={() => fileInputRef.current?.click()}
-              onDragOver={e => { e.preventDefault(); e.currentTarget.classList.add('drag-over'); }}
-              onDragLeave={e => { e.preventDefault(); e.currentTarget.classList.remove('drag-over'); }}
-              onDrop={e => { e.preventDefault(); e.currentTarget.classList.remove('drag-over'); triggerPulse(); handleFile(e.dataTransfer.files[0]); }}
-            >
-              <div className="upload-icon"><UploadCloudIcon /></div>
-              <div><strong>Click to browse</strong> or drag & drop</div>
-              <div className="upload-hint">PDF, DOCX, TXT</div>
-              <input ref={fileInputRef} type="file" accept=".pdf,.docx,.txt" style={{ display: 'none' }}
-                onChange={e => { handleFile(e.target.files[0]); e.target.value = ''; }} />
-            </div>
-          )}
+          <AnimatePresence mode="wait">
+            {activeTab === 'upload' && (
+              <motion.div
+                key="upload"
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={springs.snappy}
+              >
+                <div className={`upload-zone ${uploadPulse ? 'pulse' : ''}`} onClick={() => fileInputRef.current?.click()}
+                  onDragOver={e => { e.preventDefault(); e.currentTarget.classList.add('drag-over'); }}
+                  onDragLeave={e => { e.preventDefault(); e.currentTarget.classList.remove('drag-over'); }}
+                  onDrop={e => { e.preventDefault(); e.currentTarget.classList.remove('drag-over'); triggerPulse(); handleFile(e.dataTransfer.files[0]); }}
+                >
+                  <div className="upload-icon"><UploadCloudIcon /></div>
+                  <div><strong>Click to browse</strong> or drag & drop</div>
+                  <div className="upload-hint">PDF, DOCX, TXT</div>
+                  <input ref={fileInputRef} type="file" accept=".pdf,.docx,.txt" style={{ display: 'none' }}
+                    onChange={e => { handleFile(e.target.files[0]); e.target.value = ''; }} />
+                </div>
+              </motion.div>
+            )}
 
-          {activeTab === 'paste' && (
-            <div>
-              <textarea className="paste-area" placeholder="Paste your legal document text here..." value={pasteText} onChange={e => setPasteText(e.target.value)} />
-              <button className="btn-primary" style={{ width: '100%', marginTop: 8 }} onClick={addPastedText}><PlusIcon />Add as Text Document</button>
-            </div>
-          )}
+            {activeTab === 'paste' && (
+              <motion.div
+                key="paste"
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={springs.snappy}
+              >
+                <textarea className="paste-area" placeholder="Paste your legal document text here..." value={pasteText} onChange={e => setPasteText(e.target.value)} />
+                <AnimatedButton variant="primary" style={{ width: '100%', marginTop: 8 }} onClick={addPastedText}>
+                  <PlusIcon />Add as Text Document
+                </AnimatedButton>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           <div className="file-section-header">
             <h3>Documents</h3>
             <span className="file-count">{localFiles.length} files</span>
           </div>
           <ul className="file-list">
-            {localFiles.map(entry => (
-              <li key={entry.id} className={selectedLocalId === entry.id ? 'active' : ''} onClick={() => toggleLocal(entry)}>
-                <span className="file-icon"><FileIcon name={entry.file.name} /></span>
-                <span className="file-name">{entry.file.name}</span>
-                <span className="file-size">{formatFileSize(entry.file.size)}</span>
-                <button className="file-remove" onClick={e => removeLocal(entry.id, e)}><XIcon /></button>
-              </li>
-            ))}
+            <AnimatePresence>
+              {localFiles.map(entry => (
+                <motion.li
+                  key={entry.id}
+                  className={selectedLocalId === entry.id ? 'active' : ''}
+                  onClick={() => toggleLocal(entry)}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -10, height: 0 }}
+                  transition={springs.snappy}
+                  layout
+                >
+                  <span className="file-icon"><FileIcon name={entry.file.name} /></span>
+                  <span className="file-name">{entry.file.name}</span>
+                  <span className="file-size">{formatFileSize(entry.file.size)}</span>
+                  <button className="file-remove" onClick={e => removeLocal(entry.id, e)}><XIcon /></button>
+                </motion.li>
+              ))}
+            </AnimatePresence>
           </ul>
 
           <div className="file-section-header">
@@ -335,45 +368,64 @@ export default function DashboardPage() {
           </div>
           <ul className="file-list">
             {s3Files.map(f => (
-              <li key={f.key} className={selectedS3Keys.has(f.key) ? 'active' : ''} onClick={() => toggleS3(f.key)}>
+              <motion.li key={f.key} className={selectedS3Keys.has(f.key) ? 'active' : ''} onClick={() => toggleS3(f.key)} layout>
                 <input type="checkbox" checked={selectedS3Keys.has(f.key)} onChange={() => {}} className="file-checkbox" />
                 <span className="file-icon"><FileIcon name={f.name} /></span>
                 <span className="file-name">{f.name}</span>
                 <span className="file-size">{formatFileSize(f.size)}</span>
-              </li>
+              </motion.li>
             ))}
           </ul>
 
           <div className="action-buttons">
-            <button className="btn-ghost" disabled={!selectedLocalId || uploading} onClick={uploadToS3}>
-              {uploading ? <><LoaderIcon />Uploading...</> : <><CloudUpIcon />Upload to S3</>}
-            </button>
-            <button className="btn-primary" disabled={selectedS3Keys.size === 0 || processing} onClick={() => setShowModal(true)}>
-              {processing ? <><LoaderIcon />Processing...</> : <><SparklesIcon />Process Selected</>}
-            </button>
+            <AnimatedButton variant="ghost" disabled={!selectedLocalId || uploading} onClick={uploadToS3} style={{ flex: 1, fontSize: 12, padding: '10px 8px' }}>
+              {uploading ? <>Uploading...</> : <>Upload to S3</>}
+            </AnimatedButton>
+            <AnimatedButton variant="primary" disabled={selectedS3Keys.size === 0 || processing} onClick={() => setShowModal(true)} style={{ flex: 1, fontSize: 12, padding: '10px 8px' }}>
+              {processing ? <>Processing...</> : <>Process Selected</>}
+            </AnimatedButton>
           </div>
-        </div>
+        </motion.div>
 
         {/* MIDDLE PANEL */}
-        <div className="dash-panel middle-panel">
+        <motion.div
+          className="dash-panel middle-panel"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ ...springs.gentle, delay: 0.3 }}
+        >
           <div className="panel-top-bar">
             <h2>Preview</h2>
             {previewContent?.type === 'pdf' && (
-              <button className="btn-ghost" style={{ padding: '6px 14px', fontSize: 13 }}
+              <AnimatedButton variant="ghost" style={{ padding: '6px 14px', fontSize: 13 }}
                 onClick={() => window.open(previewContent.data, '_blank')}>
                 <DownloadIcon />Download PDF
-              </button>
+              </AnimatedButton>
             )}
           </div>
           <div className="preview-container">
             {previewLoading ? (
-              <div className="preview-empty"><div className="preview-spinner"></div><p>Loading preview...</p></div>
+              <div className="preview-empty">
+                <SkeletonLoader width="60%" height="20px" style={{ marginBottom: 8 }} />
+                <SkeletonLoader width="80%" height="16px" style={{ marginBottom: 6 }} />
+                <SkeletonLoader width="70%" height="16px" style={{ marginBottom: 6 }} />
+                <SkeletonLoader width="50%" height="16px" />
+              </div>
             ) : previewContent ? (
-              <>
-                {previewContent.type === 'pdf' && <iframe src={previewContent.data} className="preview-iframe" title="PDF Preview" />}
-                {previewContent.type === 'html' && <div className="preview-text" dangerouslySetInnerHTML={{ __html: previewContent.data }} />}
-                {previewContent.type === 'text' && <div className="preview-text"><pre>{previewContent.data}</pre></div>}
-              </>
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={previewContent.data?.slice(0, 40)}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  style={{ flex: 1, display: 'flex', flexDirection: 'column' }}
+                >
+                  {previewContent.type === 'pdf' && <iframe src={previewContent.data} className="preview-iframe" title="PDF Preview" />}
+                  {previewContent.type === 'html' && <div className="preview-text" dangerouslySetInnerHTML={{ __html: previewContent.data }} />}
+                  {previewContent.type === 'text' && <div className="preview-text"><pre>{previewContent.data}</pre></div>}
+                </motion.div>
+              </AnimatePresence>
             ) : (
               <div className="preview-empty">
                 <div style={{ opacity: 0.2, marginBottom: 16 }}><FileTextIcon size={48} /></div>
@@ -381,69 +433,86 @@ export default function DashboardPage() {
               </div>
             )}
           </div>
-        </div>
+        </motion.div>
 
         {/* RIGHT PANEL */}
-        <div className="dash-panel right-panel">
+        <motion.div
+          className="dash-panel right-panel"
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ ...springs.gentle, delay: 0.4 }}
+        >
           <h2>Drafted Documents</h2>
 
-          {uploadStatus && (
-            <div className={`status-card status-${uploadStatus.type}`}>
-              <strong>{uploadStatus.title}</strong>
-              <span>{uploadStatus.message}</span>
-              {uploadStatus.type === 'uploading' && <div className="progress-bar"><div className="progress-bar-fill" /></div>}
-            </div>
-          )}
-
           {/* Processing pipeline viz */}
-          {processing && <ProcessingPipeline step={processingStep} />}
+          <AnimatePresence>
+            {processing && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={springs.snappy}
+              >
+                <ProcessingPipeline step={processingStep} />
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           <div className="drafted-list">
-            {draftedDocs.map((doc, i) => (
-              <div key={i} className={`drafted-card glow-border ${activeDraftIdx === i ? 'active' : ''}`} onClick={() => toggleDraft(i)}>
-                <div className="drafted-icon"><ContractIcon /></div>
-                <div>
-                  <div className="drafted-title">{doc.title}</div>
-                  <div className="drafted-summary">{doc.summary}</div>
-                </div>
-              </div>
-            ))}
+            <AnimatePresence>
+              {draftedDocs.map((doc, i) => (
+                <motion.div
+                  key={i}
+                  className={`drafted-card glow-border ${activeDraftIdx === i ? 'active' : ''}`}
+                  onClick={() => toggleDraft(i)}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={springs.snappy}
+                  whileHover={{ y: -2, transition: springs.snappy }}
+                  layout
+                >
+                  <div className="drafted-icon"><ContractIcon /></div>
+                  <div>
+                    <div className="drafted-title">{doc.title}</div>
+                    <div className="drafted-summary">{doc.summary}</div>
+                  </div>
+                </motion.div>
+              ))}
+            </AnimatePresence>
           </div>
 
-          <div className="info-card glass">
-            <h4>Processing Options</h4>
-            <div className="stat-row"><span>AI Engine</span><span className="stat-value">Gemini</span></div>
-            <div className="stat-row"><span>Output</span><span className="stat-value">LaTeX → PDF</span></div>
-            <div className="stat-row"><span>Formats</span><span className="stat-value">PDF, DOCX, TXT</span></div>
-          </div>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
 
       {/* Modal */}
-      {showModal && (
-        <div className="modal-overlay" onClick={() => setShowModal(false)}>
-          <div className="modal-content glass" onClick={e => e.stopPropagation()}>
-            <div className="modal-header">
-              <h2>Select Document Type</h2>
-              <button className="modal-close" onClick={() => setShowModal(false)}><XIcon /></button>
-            </div>
-            <div className="doc-type-grid">
-              {DOC_TYPES.map(dt => (
-                <div key={dt.type} className={`doc-type-card glow-border ${selectedDocType === dt.type ? 'selected' : ''}`}
-                  onClick={() => setSelectedDocType(dt.type)}>
-                  <div className="dt-icon">{dt.icon}</div>
-                  <div className="dt-label">{dt.label}</div>
-                  <div className="dt-desc">{dt.desc}</div>
-                </div>
-              ))}
-            </div>
-            <div className="modal-footer">
-              <button className="btn-ghost" onClick={() => setShowModal(false)}>Cancel</button>
-              <button className="btn-primary" disabled={!selectedDocType} onClick={processFiles}>Generate Document</button>
-            </div>
-          </div>
+      <Modal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        title="Select Document Type"
+        maxWidth={620}
+        footer={
+          <>
+            <AnimatedButton variant="ghost" onClick={() => setShowModal(false)}>Cancel</AnimatedButton>
+            <AnimatedButton variant="primary" disabled={!selectedDocType} onClick={processFiles}>Generate Document</AnimatedButton>
+          </>
+        }
+      >
+        <div className="doc-type-grid">
+          {DOC_TYPES.map(dt => (
+            <motion.div
+              key={dt.type}
+              className={`doc-type-card glow-border ${selectedDocType === dt.type ? 'selected' : ''}`}
+              onClick={() => setSelectedDocType(dt.type)}
+              whileHover={{ y: -3, transition: springs.snappy }}
+              whileTap={{ scale: 0.97 }}
+            >
+              <div className="dt-icon">{dt.icon}</div>
+              <div className="dt-label">{dt.label}</div>
+              <div className="dt-desc">{dt.desc}</div>
+            </motion.div>
+          ))}
         </div>
-      )}
+      </Modal>
     </div>
   );
 }

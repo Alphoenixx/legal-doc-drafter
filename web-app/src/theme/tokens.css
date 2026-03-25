@@ -1,0 +1,101 @@
+/* ─── Extended Design Tokens ─── */
+:root {
+  /* Gradients */
+  --gradient-accent: linear-gradient(135deg, #12d6c5, #06b6d4);
+  --gradient-hero: linear-gradient(180deg, rgba(8, 16, 24, 0) 0%, rgba(8, 16, 24, 0.8) 100%);
+  --gradient-radial: radial-gradient(ellipse at center, rgba(18, 214, 197, 0.08), transparent 70%);
+  --gradient-section: linear-gradient(180deg, transparent, rgba(18, 214, 197, 0.02) 50%, transparent);
+
+  /* Glow */
+  --glow-sm: 0 0 15px rgba(18, 214, 197, 0.08);
+  --glow-md: 0 0 30px rgba(18, 214, 197, 0.12);
+  --glow-lg: 0 0 60px rgba(18, 214, 197, 0.15);
+  --glow-accent: 0 0 40px rgba(18, 214, 197, 0.2);
+
+  /* Shadows */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.25);
+  --shadow-md: 0 4px 24px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 24px 80px rgba(0, 0, 0, 0.6);
+  --shadow-float: 0 12px 40px rgba(0, 0, 0, 0.3), 0 0 30px rgba(18, 214, 197, 0.05);
+
+  /* Glass */
+  --glass-bg: rgba(11, 22, 32, 0.7);
+  --glass-bg-light: rgba(11, 22, 32, 0.5);
+  --glass-bg-heavy: rgba(11, 22, 32, 0.85);
+  --glass-blur: 16px;
+  --glass-blur-heavy: 32px;
+  --glass-border: rgba(203, 213, 225, 0.08);
+  --glass-border-hover: rgba(18, 214, 197, 0.15);
+
+  /* Animation durations */
+  --duration-fast: 0.15s;
+  --duration-normal: 0.3s;
+  --duration-slow: 0.5s;
+  --duration-slower: 0.8s;
+
+  /* Z-index layers */
+  --z-background: -1;
+  --z-base: 0;
+  --z-elevated: 10;
+  --z-sticky: 50;
+  --z-navbar: 100;
+  --z-modal-backdrop: 150;
+  --z-modal: 200;
+  --z-toast: 300;
+  --z-tooltip: 400;
+}
+
+/* ─── Keyframe Animations ─── */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 15px rgba(18, 214, 197, 0.08); }
+  50% { box-shadow: 0 0 30px rgba(18, 214, 197, 0.2); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes breathe {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
+}
+
+/* ─── Skeleton Loader ─── */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(203, 213, 225, 0.05) 25%,
+    rgba(203, 213, 225, 0.1) 50%,
+    rgba(203, 213, 225, 0.05) 75%
+  );
+  background-size: 400% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: var(--radius-sm);
+}
+
+/* ─── Reduced Motion ─── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

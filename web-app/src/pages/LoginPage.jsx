@@ -4,6 +4,9 @@ import { motion } from 'framer-motion';
 import { signIn, signUp, confirmSignUp } from '../auth/CognitoAuth';
 import { useAuth } from '../auth/AuthContext';
 import HeroCanvas from '../three/HeroCanvas';
+import AnimatedInput from '../components/AnimatedInput';
+import AnimatedButton from '../components/AnimatedButton';
+import { springs, fadeInUp, staggerContainer } from '../lib/motion';
 import './LoginPage.css';
 
 const ShieldScene = lazy(() => import('../three/ShieldScene'));
@@ -56,14 +59,23 @@ function PasswordStrength({ password }) {
   return (
     <div className="pw-strength">
       <div className="pw-strength-bar">
-        <div className="pw-strength-fill" style={{ width: pct + '%', background: color }} />
+        <motion.div
+          className="pw-strength-fill"
+          animate={{ width: pct + '%', background: color }}
+          transition={springs.snappy}
+        />
       </div>
       <ul className="pw-rules">
         {PASSWORD_RULES.map(r => (
-          <li key={r.id} className={r.test(password) ? 'pass' : ''}>
+          <motion.li
+            key={r.id}
+            className={r.test(password) ? 'pass' : ''}
+            animate={{ color: r.test(password) ? 'var(--success)' : 'var(--text-muted)' }}
+            transition={{ duration: 0.2 }}
+          >
             <span className="pw-rule-check">{r.test(password) ? '✓' : '○'}</span>
             {r.label}
-          </li>
+          </motion.li>
         ))}
       </ul>
     </div>
@@ -100,8 +112,6 @@ export default function LoginPage() {
   const handleSignUp = async (e) => {
     e.preventDefault();
     setError('');
-
-    // Client-side validation
     const failed = PASSWORD_RULES.filter(r => !r.test(password));
     if (failed.length > 0) {
       setError('Password does not meet the security requirements.');
@@ -111,7 +121,6 @@ export default function LoginPage() {
       setError('Passwords do not match.');
       return;
     }
-
     setLoading(true);
     try {
       await signUp(email, password);
@@ -149,9 +158,14 @@ export default function LoginPage() {
 
   return (
     <div className="login-page">
-      <HeroCanvas style={{ opacity: 0.3 }} />
+      <HeroCanvas style={{ opacity: 0.25 }} />
 
-      <motion.div className="login-card glass" initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+      <motion.div
+        className="login-card glass"
+        initial={{ opacity: 0, y: 30, scale: 0.96, filter: 'blur(6px)' }}
+        animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
+        transition={springs.smooth}
+      >
         {/* Header */}
         <div className="login-header">
           <Suspense fallback={
@@ -165,7 +179,14 @@ export default function LoginPage() {
           }>
             <ShieldScene />
           </Suspense>
-          <h2>{mode === 'login' ? 'Sign In' : mode === 'signup' ? 'Create Account' : 'Verify Email'}</h2>
+          <motion.h2
+            key={mode}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={springs.snappy}
+          >
+            {mode === 'login' ? 'Sign In' : mode === 'signup' ? 'Create Account' : 'Verify Email'}
+          </motion.h2>
           <p className="login-subtitle">
             {mode === 'login' && 'Access your secure legal workspace'}
             {mode === 'signup' && 'Set up your professional account'}
@@ -175,92 +196,167 @@ export default function LoginPage() {
 
         {/* Sign In Form */}
         {mode === 'login' && (
-          <form onSubmit={handleLogin} className="login-form">
-            <div className="form-group">
-              <label htmlFor="login-email">Email Address</label>
-              <input id="login-email" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="name@organization.com" required autoComplete="email" />
-            </div>
-            <div className="form-group">
-              <label htmlFor="login-password">Password</label>
-              <div className="password-field">
-                <input id="login-password" type={showPassword ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} placeholder="Enter your password" required autoComplete="current-password" />
-                <button type="button" className="toggle-pw" onClick={() => setShowPassword(!showPassword)} title={showPassword ? 'Hide password' : 'Show password'} aria-label={showPassword ? 'Hide password' : 'Show password'}>
-                  {showPassword ? <EyeOffIcon /> : <EyeIcon />}
-                </button>
-              </div>
-            </div>
-            {error && <div className="login-error"><ShieldIcon />{error}</div>}
-            <button type="submit" className="btn-primary login-btn" disabled={loading}>
-              {loading ? (
-                <><span className="btn-spinner" /> Authenticating...</>
-              ) : 'Sign In'}
-            </button>
+          <motion.form
+            onSubmit={handleLogin}
+            className="login-form"
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={springs.gentle}
+          >
+            <AnimatedInput
+              id="login-email"
+              type="email"
+              label="Email Address"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              placeholder="name@organization.com"
+              required
+              autoComplete="email"
+            />
+            <AnimatedInput
+              id="login-password"
+              type={showPassword ? 'text' : 'password'}
+              label="Password"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              placeholder="Enter your password"
+              required
+              autoComplete="current-password"
+            >
+              <button type="button" className="toggle-pw" onClick={() => setShowPassword(!showPassword)} title={showPassword ? 'Hide password' : 'Show password'} aria-label={showPassword ? 'Hide password' : 'Show password'}>
+                {showPassword ? <EyeOffIcon /> : <EyeIcon />}
+              </button>
+            </AnimatedInput>
+
+            {error && (
+              <motion.div
+                className="login-error"
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={springs.snappy}
+              >
+                <ShieldIcon />{error}
+              </motion.div>
+            )}
+
+            <AnimatedButton type="submit" variant="primary" loading={loading} className="login-btn">
+              {loading ? 'Authenticating...' : 'Sign In'}
+            </AnimatedButton>
+
             <div className="login-divider"><span>or</span></div>
+
             <p className="login-switch">
               New to Legal Doc Drafter? <button type="button" onClick={() => switchMode('signup')}>Create an account</button>
             </p>
-          </form>
+          </motion.form>
         )}
 
         {/* Sign Up Form */}
         {mode === 'signup' && (
-          <form onSubmit={handleSignUp} className="login-form">
-            <div className="form-group">
-              <label htmlFor="signup-email">Email Address</label>
-              <input id="signup-email" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="name@organization.com" required autoComplete="email" />
-            </div>
-            <div className="form-group">
-              <label htmlFor="signup-password">Password</label>
-              <div className="password-field">
-                <input id="signup-password" type={showPassword ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} placeholder="Create a secure password" required autoComplete="new-password" />
-                <button type="button" className="toggle-pw" onClick={() => setShowPassword(!showPassword)} title={showPassword ? 'Hide password' : 'Show password'} aria-label={showPassword ? 'Hide password' : 'Show password'}>
-                  {showPassword ? <EyeOffIcon /> : <EyeIcon />}
-                </button>
-              </div>
-              <PasswordStrength password={password} />
-            </div>
-            <div className="form-group">
-              <label htmlFor="signup-confirm">Confirm Password</label>
-              <div className="password-field">
-                <input id="signup-confirm" type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} placeholder="Re-enter your password" required autoComplete="new-password" />
-                {confirmPassword && (
-                  <span className={`confirm-indicator ${password === confirmPassword ? 'match' : 'mismatch'}`}>
-                    {password === confirmPassword ? '✓' : '✗'}
-                  </span>
-                )}
-              </div>
-            </div>
-            {error && <div className="login-error"><ShieldIcon />{error}</div>}
-            <button type="submit" className="btn-primary login-btn" disabled={loading}>
-              {loading ? (
-                <><span className="btn-spinner" /> Creating account...</>
-              ) : 'Create Account'}
-            </button>
+          <motion.form
+            onSubmit={handleSignUp}
+            className="login-form"
+            initial={{ opacity: 0, x: 10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={springs.gentle}
+          >
+            <AnimatedInput
+              id="signup-email"
+              type="email"
+              label="Email Address"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              placeholder="name@organization.com"
+              required
+              autoComplete="email"
+            />
+            <AnimatedInput
+              id="signup-password"
+              type={showPassword ? 'text' : 'password'}
+              label="Password"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              placeholder="Create a secure password"
+              required
+              autoComplete="new-password"
+            >
+              <button type="button" className="toggle-pw" onClick={() => setShowPassword(!showPassword)} title={showPassword ? 'Hide password' : 'Show password'} aria-label={showPassword ? 'Hide password' : 'Show password'}>
+                {showPassword ? <EyeOffIcon /> : <EyeIcon />}
+              </button>
+            </AnimatedInput>
+            <PasswordStrength password={password} />
+
+            <AnimatedInput
+              id="signup-confirm"
+              type="password"
+              label="Confirm Password"
+              value={confirmPassword}
+              onChange={e => setConfirmPassword(e.target.value)}
+              placeholder="Re-enter your password"
+              required
+              autoComplete="new-password"
+            >
+              {confirmPassword && (
+                <span className={`confirm-indicator ${password === confirmPassword ? 'match' : 'mismatch'}`}>
+                  {password === confirmPassword ? '✓' : '✗'}
+                </span>
+              )}
+            </AnimatedInput>
+
+            {error && (
+              <motion.div className="login-error" initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} transition={springs.snappy}>
+                <ShieldIcon />{error}
+              </motion.div>
+            )}
+
+            <AnimatedButton type="submit" variant="primary" loading={loading} className="login-btn">
+              {loading ? 'Creating account...' : 'Create Account'}
+            </AnimatedButton>
+
             <div className="login-divider"><span>or</span></div>
+
             <p className="login-switch">
               Already have an account? <button type="button" onClick={() => switchMode('login')}>Sign in</button>
             </p>
-          </form>
+          </motion.form>
         )}
 
         {/* Email Verification */}
         {mode === 'confirm' && (
-          <form onSubmit={handleConfirm} className="login-form">
+          <motion.form
+            onSubmit={handleConfirm}
+            className="login-form"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={springs.gentle}
+          >
             <div className="verify-notice">
               <LockIcon />
               <span>A 6-digit verification code has been sent to <strong>{email}</strong></span>
             </div>
-            <div className="form-group">
-              <label htmlFor="verify-code">Verification Code</label>
-              <input id="verify-code" type="text" value={code} onChange={e => setCode(e.target.value)} placeholder="Enter 6-digit code" required maxLength={6} autoComplete="one-time-code" style={{ letterSpacing: '4px', textAlign: 'center', fontSize: 18, fontWeight: 600 }} />
-            </div>
-            {error && <div className="login-error"><ShieldIcon />{error}</div>}
-            <button type="submit" className="btn-primary login-btn" disabled={loading}>
-              {loading ? (
-                <><span className="btn-spinner" /> Verifying...</>
-              ) : 'Verify & Continue'}
-            </button>
-          </form>
+            <AnimatedInput
+              id="verify-code"
+              type="text"
+              label="Verification Code"
+              value={code}
+              onChange={e => setCode(e.target.value)}
+              placeholder="Enter 6-digit code"
+              required
+              maxLength={6}
+              autoComplete="one-time-code"
+              style={{ letterSpacing: '4px', textAlign: 'center', fontSize: 18, fontWeight: 600 }}
+            />
+
+            {error && (
+              <motion.div className="login-error" initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} transition={springs.snappy}>
+                <ShieldIcon />{error}
+              </motion.div>
+            )}
+
+            <AnimatedButton type="submit" variant="primary" loading={loading} className="login-btn">
+              {loading ? 'Verifying...' : 'Verify & Continue'}
+            </AnimatedButton>
+          </motion.form>
         )}
 
         {/* Security Footer */}
