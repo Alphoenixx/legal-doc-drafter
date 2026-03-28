@@ -108,7 +108,7 @@ Once configured, build the web app (`npm run build` inside `web-app/`) and uploa
 
 ## 📜 License
 
-License is currently **not specified**. If you plan to open-source this repository, please add a `LICENSE` file.
+License is currently **not specified**.
 
 ---
 
