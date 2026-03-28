@@ -10,7 +10,7 @@ This repository is organized as a monorepo containing:
 
 ### 🌐 Live Hosted App
 The web application is currently live and hosted via AWS S3:
-- **Web App URL:** [https://doc-parser-app-as.s3.ap-south-1.amazonaws.com/doc-parser.html](https://doc-parser-app-as.s3.ap-south-1.amazonaws.com/doc-parser.html)
+- **Web App URL:** http://doc-parser-app-as.s3-website.ap-south-1.amazonaws.com/
 
 ### Key features
 
